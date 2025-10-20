@@ -1,0 +1,46 @@
+package org.xyjh.xyjhstartweb.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.xyjh.xyjhstartweb.entity.AccountInfo;
+import org.xyjh.xyjhstartweb.entity.AccountLoginResult;
+import org.xyjh.xyjhstartweb.mapper.AccountInfoMapper;
+import org.xyjh.xyjhstartweb.util.login.LoginUtil;
+import org.xyjh.xyjhstartweb.util.Result;
+
+@Service
+public class AccountInfoService {
+
+    @Autowired
+    private AccountInfoMapper accountInfoMapper;
+
+    /**
+     * 添加账号并验证
+     * @param accountInfo 账号信息
+     * @return Result 封装登录验证结果和提示信息
+     */
+    public Result<AccountLoginResult> addAccount(AccountInfo accountInfo) {
+        try {
+            // 调用原有登录验证逻辑（无需代理）
+            String[] loginResult = LoginUtil.interactiveLogin(true, 7890,
+                    accountInfo.getAccount(), accountInfo.getPassword());
+
+            // 验证账号是否有效
+            if (loginResult[0] == null || loginResult[0].isEmpty()) {
+                return Result.fail("验证失败：登录返回信息为空");
+            }
+
+            // 保存到数据库
+            accountInfoMapper.insertAccount(accountInfo);
+
+            // 封装 token 和 aid
+            AccountLoginResult loginData = new AccountLoginResult(loginResult[0], loginResult[1]);
+
+            // 返回成功 Result
+            return Result.success("验证成功，账号已保存", loginData);
+        } catch (Exception e) {
+            return Result.fail("验证失败：" + e.getMessage());
+        }
+    }
+
+}
