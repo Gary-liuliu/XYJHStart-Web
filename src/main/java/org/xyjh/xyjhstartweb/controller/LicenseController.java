@@ -1,18 +1,22 @@
 package org.xyjh.xyjhstartweb.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.xyjh.xyjhstartweb.dto.ActivationRequest;
+import org.xyjh.xyjhstartweb.service.AccountInfoService;
 import org.xyjh.xyjhstartweb.service.LicenseService;
 import org.xyjh.xyjhstartweb.util.Result;
 
 @RestController
 @RequestMapping("/api/license") // 为所有与许可证相关的API设置一个统一的基础路径
-@Slf4j
 public class LicenseController {
 
     private final LicenseService licenseService;
+
+    private static final Logger log = LoggerFactory.getLogger(AccountInfoService.class);
 
     // 推荐使用构造函数注入，而不是字段注入
     @Autowired

@@ -28,4 +28,52 @@ public class PagedResult<T> {
 
     // 当前页的数据列表
     private List<T> content;
+
+    public PagedResult(int pageNumber, int pageSize, int totalPages, long totalElements, List<T> content) {
+        this.pageNumber = pageNumber;
+        this.pageSize = pageSize;
+        this.totalPages = totalPages;
+        this.totalElements = totalElements;
+        this.content = content;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
+    }
+
+    public long getTotalElements() {
+        return totalElements;
+    }
+
+    public void setTotalElements(long totalElements) {
+        this.totalElements = totalElements;
+    }
+
+    public List<T> getContent() {
+        return content;
+    }
+
+    public void setContent(List<T> content) {
+        this.content = content;
+    }
 }

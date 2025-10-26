@@ -9,4 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ActivationResponse {
     private String token; // The JWT
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

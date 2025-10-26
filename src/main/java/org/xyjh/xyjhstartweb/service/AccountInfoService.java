@@ -7,6 +7,9 @@ import org.xyjh.xyjhstartweb.entity.AccountLoginResult;
 import org.xyjh.xyjhstartweb.mapper.AccountInfoMapper;
 import org.xyjh.xyjhstartweb.util.login.LoginUtil;
 import org.xyjh.xyjhstartweb.util.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 @Slf4j
@@ -14,6 +17,7 @@ public class AccountInfoService {
 
     @Autowired
     private AccountInfoMapper accountInfoMapper;
+    private static final Logger log = LoggerFactory.getLogger(AccountInfoService.class);
 
     /**
      * 添加账号并验证
@@ -21,6 +25,7 @@ public class AccountInfoService {
      * @return Result 封装登录验证结果和提示信息
      */
     public Result<AccountLoginResult> addAccount(AccountInfo accountInfo) {
+
         // 使用 log 对象记录日志
         log.info("开始处理添加账号请求，账号为: {}", accountInfo.getAccount());
         try {

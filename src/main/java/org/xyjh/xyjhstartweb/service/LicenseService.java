@@ -2,6 +2,8 @@ package org.xyjh.xyjhstartweb.service;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xyjh.xyjhstartweb.dto.ActivationRequest;
@@ -20,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class LicenseService {
 
     @Autowired
@@ -28,6 +29,8 @@ public class LicenseService {
 
     @Autowired
     private JwtUtil jwtUtil;
+    private static final Logger log = LoggerFactory.getLogger(AccountInfoService.class);
+
 
     // =================================================================
     // ==                 面向客户端的接口 (Client-Facing)                 ==
