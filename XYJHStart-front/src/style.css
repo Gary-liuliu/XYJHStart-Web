@@ -1,0 +1,76 @@
+/*
+  全局 CSS 重置
+*/
+html,
+body,
+#app {
+  /* 让你的应用 100% 占满浏览器窗口
+    移除所有默认的 margin 和 padding
+  */
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  
+  /* 设置一个统一、现代的字体
+    这会修复 Element Plus 字体在非组件区域不一致的问题
+  */
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+  【抽屉白色边框修复】
+  我们把这个修复代码从 AppLayout.vue 移到这里，
+  作为全局样式，确保它 100% 生效。
+*/
+.mobile-drawer .el-drawer__body {
+  padding: 0 !important; 
+  background-color: #304156; 
+}
+/* 移动端抽屉移除默认阴影/边框，避免看起来有白边 */
+.mobile-drawer {
+  box-shadow: none !important;
+  border: none !important;
+}
+.mobile-drawer .el-drawer__body {
+  padding: 0 !important; 
+  background-color: #304156; /* 让抽屉主体背景与菜单一致，消除白色边缘感 */
+}
+/* 移动端抽屉移除默认阴影/边框，避免看起来有白边 */
+.mobile-drawer {
+  box-shadow: none !important;
+  border: none !important;
+  background-color: #304156 !important; /* Drawer 根元素改为深色，防止根元素白底露出 */
+}
+
+/* Drawer 内部的菜单移除右侧边框，避免 1px 白线 */
+.mobile-drawer .el-menu {
+  border-right: none !important;
+  background-color: #304156 !important;
+}
+el-drawer__container {
+  padding: 0 !important;
+}
+
+.el-drawer {
+  height: 100vh !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: #304156 !important; /* 根元素改为深色，避免白底露出 */
+}
+
+.el-drawer__body {
+  padding: 0 !important;
+  height: 100% !important;
+  background-color: #304156 !important;
+}
+
+/* 移除菜单可能导致的右侧白边/缝隙 */
+.mobile-drawer .el-menu {
+  border-right: none !important;
+  background-color: #304156 !important;
+  height: 100%;
+}
