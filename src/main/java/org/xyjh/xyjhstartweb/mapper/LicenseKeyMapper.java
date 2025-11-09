@@ -71,11 +71,29 @@ public interface LicenseKeyMapper {
     int submitForApproval(@Param("licenseKey") String licenseKey, @Param("deviceId") String deviceId);
 
     /**
-     * [新] 管理员批准：更新状态、激活日期和【过期日期】
+     * [修改] 管理员批准：更新状态、激活/过期日期，并可选更新备注
+     * @param id 许可证ID
+     * @param activationDate 激活日期
+     * @param expirationDate 过期日期
+     * @param tipCustomer 客户备注 (如果为 null, 则不更新)
+     * @return 影响的行数
      */
-    @Update("UPDATE license_key SET status = 'ACTIVATED', activation_date = #{activationDate}, expiration_date = #{expirationDate} WHERE id = #{id}")
-    int approve(@Param("id") Long id, @Param("activationDate") Date activationDate, @Param("expirationDate") Date expirationDate);
-
+    @Update({
+            "<script>",
+            "UPDATE license_key",
+            "  <set>",
+            "    status = 'ACTIVATED',",
+            "    activation_date = #{activationDate},",
+            "    expiration_date = #{expirationDate},",
+            "    <if test='tipCustomer != null'>tip_customer = #{tipCustomer}</if>",
+            "  </set>",
+            "WHERE id = #{id}",
+            "</script>"
+    })
+    int approve(@Param("id") Long id,
+                @Param("activationDate") Date activationDate,
+                @Param("expirationDate") Date expirationDate,
+                @Param("tipCustomer") String tipCustomer);
     /**
      * [新] 查询指定状态的所有密钥（用于后台查询待审批列表）
      */
@@ -90,14 +108,12 @@ public interface LicenseKeyMapper {
      */
     @Select("SELECT * FROM license_key ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}")
     List<LicenseKey> findAllPaginated(@Param("limit") int limit, @Param("offset") int offset);
-
     /**
      * 查询所有许可证密钥的总数
      * @return 总数
      */
     @Select("SELECT COUNT(*) FROM license_key")
     long countAll();
-
     /**
      * 分页查询所有已激活的许可证密钥
      * @param limit 每页数量
@@ -106,13 +122,117 @@ public interface LicenseKeyMapper {
      */
     @Select("SELECT * FROM license_key WHERE status = 'ACTIVATED' ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}")
     List<LicenseKey> findActivatedPaginated(@Param("limit") int limit, @Param("offset") int offset);
-
     /**
      * 查询所有已激活的许可证密钥的总数
      * @return 总数
      */
     @Select("SELECT COUNT(*) FROM license_key WHERE status = 'ACTIVATED'")
     long countActivated();
+    /**
+     * [新增] 批量插入许可证密钥
+     * @param keys 要插入的许可证密钥列表
+     * @return 返回影响的行数
+     */
+    @Insert({
+            "<script>",
+            "INSERT INTO license_key (license_key, status) VALUES",
+            "<foreach collection='keys' item='key' separator=','>",
+            "(#{key.licenseKey}, 'AVAILABLE')",
+            "</foreach>",
+            "</script>"
+    })
+    @Options(useGeneratedKeys = true, keyProperty = "id") // Note: This might only return the last generated ID for some DBs
+    int batchInsert(@Param("keys") List<LicenseKey> keys);
+    /**
+     * [新增] 查找所有已过期但状态仍为 ACTIVATED 的许可证
+     * @return 过期的许可证列表
+     */
+    @Select("SELECT * FROM license_key WHERE status = 'ACTIVATED' AND expiration_date < NOW()")
+    List<LicenseKey> findExpiredButActiveKeys();
+    /**
+     * [新增] 批量更新许可证的状态
+     * @param ids 要更新的许可证ID列表
+     * @param status 新的状态
+     * @return 影响的行数
+     */
+    @Update({
+            "<script>",
+            "UPDATE license_key SET status = #{status} WHERE id IN",
+            "<foreach item='id' collection='ids' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</script>"
+    })
+    int batchUpdateStatus(@Param("ids") List<Long> ids, @Param("status") String status);
 
+    /**
+     * [新增] 根据ID更新单个许可证的状态
+     * @param id 许可证ID
+     * @param status 新的状态
+     * @return 影响的行数
+     */
+    @Update("UPDATE license_key SET status = #{status} WHERE id = #{id}")
+    int updateStatusById(@Param("id") Long id, @Param("status") String status);
 
+    /**
+     * [修改] 续期或更新一个许可证：
+     * 动态更新过期日期、备注，并将状态设为 ACTIVATED
+     * @param id 要续期的许可证ID
+     * @param newExpirationDate 新的过期日期 (如果为 null, 则不更新)
+     * @param tipCustomer 新的客户备注 (如果为 null, 则不更新)
+     * @return 影响的行数
+     */
+    @Update({
+            "<script>",
+            "UPDATE license_key",
+            "  <set>",
+            "    status = 'ACTIVATED',", // 续期/更新操作总是将其设置为激活状态
+            "    <if test='newExpirationDate != null'>expiration_date = #{newExpirationDate},</if>",
+            "    <if test='tipCustomer != null'>tip_customer = #{tipCustomer},</if>",
+            "  </set>",
+            "WHERE id = #{id}",
+            "</script>"
+    })
+    int renew(@Param("id") Long id,
+              @Param("newExpirationDate") Date newExpirationDate,
+              @Param("tipCustomer") String tipCustomer);
+    /**
+     * [新增] 分页查询所有待审批的许可证密钥
+     * @param limit 每页数量
+     * @param offset 起始位置
+     * @return 返回当前页的待审批许可证密钥列表
+     */
+    @Select("SELECT * FROM license_key WHERE status = 'PENDING_APPROVAL' ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}")
+    List<LicenseKey> findPendingPaginated(@Param("limit") int limit, @Param("offset") int offset);
+
+    /**
+     * [新增] 查询所有待审批的许可证密钥的总数
+     * @return 总数
+     */
+    @Select("SELECT COUNT(*) FROM license_key WHERE status = 'PENDING_APPROVAL'")
+    long countPending();
+
+    /**
+     * [新增] 分页查询所有已过期的许可证密钥
+     * @param limit 每页数量
+     * @param offset 起始位置
+     * @return 返回当前页的已过期许可证密钥列表
+     */
+    @Select("SELECT * FROM license_key WHERE status = 'EXPIRED' ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}")
+    List<LicenseKey> findExpiredPaginated(@Param("limit") int limit, @Param("offset") int offset);
+
+    /**
+     * [新增] 查询所有已过期的许可证密钥的总数
+     * @return 总数
+     */
+    @Select("SELECT COUNT(*) FROM license_key WHERE status = 'EXPIRED'")
+    long countExpired();
+    /**
+     * [新增] 单独更新指定ID的许可证备注
+     * @param id 许可证ID
+     * @param tipCustomer 新的备注内容 (可以为 null)
+     * @return 影响的行数
+     */
+    @Update("UPDATE license_key SET tip_customer = #{tipCustomer} WHERE id = #{id}")
+    int updateNote(@Param("id") Long id, @Param("tipCustomer") String tipCustomer);
 }

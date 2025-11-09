@@ -28,9 +28,6 @@ public class LicenseController {
      * [已重构] 客户端提交激活申请接口
      * @param request 包含 licenseKey 和 deviceId 的请求体
      * @return 返回包含JWT的激活结果
-     *
-     *
-     *
      */
     @PostMapping("/activate")
     public Result<String> submitActivation(@RequestBody ActivationRequest request) {
@@ -59,8 +56,4 @@ public class LicenseController {
         }
         return Result.fail(400, "无效的请求头"); // 400 Bad Request
     }
-
-
-
-
 }

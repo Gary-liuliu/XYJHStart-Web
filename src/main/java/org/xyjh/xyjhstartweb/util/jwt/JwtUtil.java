@@ -36,6 +36,21 @@ public class JwtUtil {
                 .compact();
     }
 
+
+    /**
+     * 【新增方法】专门为管理员生成Token
+     * @param username       管理员的用户名
+     * @param expirationDate 过期时间
+     * @return 返回生成的JWT字符串
+     */
+    public String generateAdminToken(String username, Date expirationDate) {
+        return Jwts.builder()
+                .setSubject(username) // 直接将用户名作为 subject
+                .setIssuedAt(new Date())
+                .setExpiration(expirationDate)
+                .signWith(SECRET_KEY)
+                .compact();
+    }
     /**
      * 从 JWT 中解析出所有声明 (Claims)
      * @param token 客户端传来的 JWT
@@ -53,4 +68,5 @@ public class JwtUtil {
             return null;
         }
     }
+
 }

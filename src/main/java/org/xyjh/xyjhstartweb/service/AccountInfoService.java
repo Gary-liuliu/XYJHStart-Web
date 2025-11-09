@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 
 @Service
-@Slf4j
+
 public class AccountInfoService {
 
     @Autowired

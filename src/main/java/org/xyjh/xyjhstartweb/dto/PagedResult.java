@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+
 public class PagedResult<T> {
     // 当前页码 (从 0 开始)
     private int pageNumber;
