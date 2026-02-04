@@ -13,4 +13,28 @@ public class CreateAdminRequest {
     private String password;
     // (可选) 新管理员的角色，默认为 ADMIN
     private String role = "ADMIN";
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

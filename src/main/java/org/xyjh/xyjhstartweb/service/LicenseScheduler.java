@@ -1,6 +1,8 @@
 package org.xyjh.xyjhstartweb.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.xyjh.xyjhstartweb.dto.PagedResult;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 public class LicenseScheduler {
 
     private final LicenseKeyMapper licenseKeyMapper;
+
+    private static final Logger log = LoggerFactory.getLogger(AccountInfoService.class);
 
     public LicenseScheduler(LicenseKeyMapper licenseKeyMapper) {
         this.licenseKeyMapper = licenseKeyMapper;

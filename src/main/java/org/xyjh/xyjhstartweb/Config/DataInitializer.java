@@ -26,7 +26,6 @@ public class DataInitializer implements CommandLineRunner {
         if (adminUserMapper.findByUsername("admin") == null) {
             AdminUser admin = new AdminUser();
             admin.setUsername("admin");
-            // 【重要】请将 "your_strong_default_password" 替换为您自己的强密码
             admin.setPassword(passwordEncoder.encode("test1234"));
             admin.setRole("ADMIN");
             adminUserMapper.insert(admin);

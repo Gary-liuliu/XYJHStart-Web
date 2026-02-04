@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // 客户端接口：全部放行
                         .requestMatchers("/api/license/**").permitAll()
+                        .requestMatchers("/account/add").permitAll()
 
                         // 【修改点 2】: 修正并添加你前端正在使用的登录路径
                         .requestMatchers("/api/admin/licenses/login").permitAll()

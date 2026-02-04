@@ -1,6 +1,8 @@
 package org.xyjh.xyjhstartweb.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ public class AdminUserService {
     private final AdminUserMapper adminUserMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil; // 登录需要 JWT 工具
+
+    private static final Logger log = LoggerFactory.getLogger(AccountInfoService.class);
 
     public AdminUserService(AdminUserMapper adminUserMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.adminUserMapper = adminUserMapper;

@@ -5,8 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
+import org.xyjh.xyjhstartweb.util.LicenseKeyDeriver;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -24,15 +26,19 @@ public class JwtUtil {
      * @return 返回生成的JWT字符串
      */
     public String generateToken(String deviceId, String licenseKey, Date expirationDate) {
-        Date now = new Date();
+        if (licenseKey == null || licenseKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("License key cannot be null or empty");
+        }
+
+        SecretKey signingKey = LicenseKeyDeriver.deriveHS256Key(licenseKey);
 
         return Jwts.builder()
                 .setSubject(licenseKey)
+                .claim("licenseKey", licenseKey)
                 .claim("deviceId", deviceId)
-                .setIssuedAt(now)
-                // 使用管理员设定的过期时间
+                .setIssuedAt(new Date())
                 .setExpiration(expirationDate)
-                .signWith(SECRET_KEY)
+                .signWith(signingKey) // ✅ 使用派生的 256 位密钥
                 .compact();
     }
 

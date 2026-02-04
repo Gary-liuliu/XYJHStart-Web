@@ -13,4 +13,12 @@ public class UpdateNoteRequest {
      * (注意: 如果前端传 null, 备注将被清空)
      */
     private String tipCustomer;
+
+    public String getTipCustomer() {
+        return tipCustomer;
+    }
+
+    public void setTipCustomer(String tipCustomer) {
+        this.tipCustomer = tipCustomer;
+    }
 }

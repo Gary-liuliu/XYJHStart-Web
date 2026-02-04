@@ -17,4 +17,12 @@ public class ApproveLicenseRequest {
     }
     // 客户信息备注 (可选)
     private String tipCustomer;
+
+    public String getTipCustomer() {
+        return tipCustomer;
+    }
+
+    public void setTipCustomer(String tipCustomer) {
+        this.tipCustomer = tipCustomer;
+    }
 }

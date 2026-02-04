@@ -21,4 +21,20 @@ public class RenewLicenseRequest {
      * 如果提供此字段，将覆盖旧的备注。
      */
     private String tipCustomer;
+
+    public Integer getDurationInDays() {
+        return durationInDays;
+    }
+
+    public void setDurationInDays(Integer durationInDays) {
+        this.durationInDays = durationInDays;
+    }
+
+    public String getTipCustomer() {
+        return tipCustomer;
+    }
+
+    public void setTipCustomer(String tipCustomer) {
+        this.tipCustomer = tipCustomer;
+    }
 }
