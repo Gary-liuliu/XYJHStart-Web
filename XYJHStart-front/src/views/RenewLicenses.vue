@@ -4,6 +4,23 @@
       <div>许可证续期</div>
     </template>
 
+    <div class="search-controls">
+      <el-input
+        v-model="searchTipCustomer"
+        placeholder="输入备注进行搜索"
+        style="max-width: 300px; margin-bottom: 16px;"
+        clearable
+        @keyup.enter="handleSearch"
+      >
+        <template #prepend>备注</template>
+        <template #append>
+          <el-button @click="handleSearch">
+            <el-icon><Search /></el-icon>
+          </el-button>
+        </template>
+      </el-input>
+    </div>
+
     <div class="list-controls" v-if="isMobile">
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <span>每页</span>
@@ -141,6 +158,7 @@ import { ref, onMounted, reactive } from 'vue'
 import api from '../utils/api'
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 
 const loading = ref(false)
 const tableData = ref([])
@@ -149,15 +167,26 @@ const page = ref(1)
 const pageSize = ref(8)
 const total = ref(0)
 
+// 添加搜索相关变量
+const searchTipCustomer = ref('')
+
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('md')
 
 const loadData = async () => {
   loading.value = true
   try {
-    const res = await api.get('/api/admin/licenses/expired', {
-      params: { page: Math.max(page.value - 1, 0), size: pageSize.value }
-    })
+    const params = {
+      page: Math.max(page.value - 1, 0),
+      size: pageSize.value
+    }
+    
+    // 如果搜索条件存在，则添加到参数中
+    if (searchTipCustomer.value) {
+      params.tipCustomer = searchTipCustomer.value
+    }
+    
+    const res = await api.get('/api/admin/licenses/expired', { params })
     tableData.value = res.content || []
     total.value = res.totalElements || 0
   } catch (e) {
@@ -165,6 +194,12 @@ const loadData = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 处理搜索事件
+const handleSearch = () => {
+  page.value = 1 // 搜索时回到第一页
+  loadData()
 }
 
 const handleSizeChange = (val) => {
@@ -267,5 +302,8 @@ onMounted(loadData)
 }
 .list-controls {
   margin-bottom: 8px;
+}
+.search-controls {
+  margin-bottom: 16px;
 }
 </style>

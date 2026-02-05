@@ -108,12 +108,38 @@ public interface LicenseKeyMapper {
      */
     @Select("SELECT * FROM license_key ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}")
     List<LicenseKey> findAllPaginated(@Param("limit") int limit, @Param("offset") int offset);
+
+    /**
+     * [新增] 根据 tip_customer 条件分页查询所有许可证密钥
+     * @param limit 每页数量
+     * @param offset 起始位置
+     * @param tipCustomer 客户备注条件（可为空）
+     * @return 返回符合条件的许可证密钥列表
+     */
+    @Select({
+        "SELECT * FROM license_key WHERE tip_customer LIKE CONCAT('%', #{tipCustomer}, '%') ",
+        "ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}"
+    })
+    List<LicenseKey> findAllPaginatedByTipCustomer(
+        @Param("limit") int limit, 
+        @Param("offset") int offset, 
+        @Param("tipCustomer") String tipCustomer);
     /**
      * 查询所有许可证密钥的总数
      * @return 总数
      */
     @Select("SELECT COUNT(*) FROM license_key")
     long countAll();
+
+    /**
+     * [新增] 根据 tip_customer 条件查询许可证密钥的总数
+     * @param tipCustomer 客户备注条件（可为空）
+     * @return 符合条件的总数
+     */
+    @Select({
+        "SELECT COUNT(*) FROM license_key WHERE tip_customer LIKE CONCAT('%', #{tipCustomer}, '%')"
+    })
+    long countAllByTipCustomer(@Param("tipCustomer") String tipCustomer);
     /**
      * 分页查询所有已激活的许可证密钥
      * @param limit 每页数量
@@ -222,11 +248,37 @@ public interface LicenseKeyMapper {
     List<LicenseKey> findExpiredPaginated(@Param("limit") int limit, @Param("offset") int offset);
 
     /**
+     * [新增] 根据 tip_customer 条件分页查询已过期的许可证密钥
+     * @param limit 每页数量
+     * @param offset 起始位置
+     * @param tipCustomer 客户备注条件（可为空）
+     * @return 返回符合条件的已过期许可证密钥列表
+     */
+    @Select({
+        "SELECT * FROM license_key WHERE status = 'EXPIRED' AND tip_customer LIKE CONCAT('%', #{tipCustomer}, '%') ",
+        "ORDER BY id DESC LIMIT #{limit} OFFSET #{offset}"
+    })
+    List<LicenseKey> findExpiredPaginatedByTipCustomer(
+        @Param("limit") int limit, 
+        @Param("offset") int offset, 
+        @Param("tipCustomer") String tipCustomer);
+
+    /**
      * [新增] 查询所有已过期的许可证密钥的总数
      * @return 总数
      */
     @Select("SELECT COUNT(*) FROM license_key WHERE status = 'EXPIRED'")
     long countExpired();
+
+    /**
+     * [新增] 根据 tip_customer 条件查询已过期许可证密钥的总数
+     * @param tipCustomer 客户备注条件（可为空）
+     * @return 符合条件的总数
+     */
+    @Select({
+        "SELECT COUNT(*) FROM license_key WHERE status = 'EXPIRED' AND tip_customer LIKE CONCAT('%', #{tipCustomer}, '%')"
+    })
+    long countExpiredByTipCustomer(@Param("tipCustomer") String tipCustomer);
     /**
      * [新增] 单独更新指定ID的许可证备注
      * @param id 许可证ID

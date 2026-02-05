@@ -35,8 +35,9 @@ public class AdminLicenseController {
     @GetMapping
     public Result<PagedResult<LicenseKey>> getAllLicenseKeysPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return licenseService.getAllKeysPaginated(page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String tipCustomer) {
+        return licenseService.getAllKeysPaginatedWithCondition(page, size, tipCustomer);
     }
     /**
      * [新增] 分页获取所有已激活的许可证密钥列表
@@ -134,13 +135,15 @@ public class AdminLicenseController {
      * [新增] 分页获取所有已过期的许可证密钥列表
      * @param page 请求的页码 (从 0 开始)，默认为 0
      * @param size 每页的数量，默认为 10
+     * @param tipCustomer 客户备注条件查询（可选参数）
      * @return 包含分页信息的已过期密钥列表
      */
     @GetMapping("/expired")
     public Result<PagedResult<LicenseKey>> getExpiredLicenseKeysPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return licenseService.getExpiredKeysPaginated(page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String tipCustomer) {
+        return licenseService.getExpiredKeysPaginatedWithCondition(page, size, tipCustomer);
     }
     /**
      * [新增] 单独更新一个许可证的备注

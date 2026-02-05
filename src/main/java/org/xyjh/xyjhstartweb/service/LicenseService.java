@@ -235,7 +235,6 @@ public class LicenseService {
      * @param token 客户端本地存储的 JWT
      * @return 验证结果
      */
-    // ... (validateToken 方法需要微调以处理过期) ...
     public Result<Void> validateToken(String token) {
         Claims claims = jwtUtil.getClaimsFromToken(token);
         if (claims == null) {
@@ -300,13 +299,36 @@ public class LicenseService {
      * @return 封装好的分页结果
      */
     public Result<PagedResult<LicenseKey>> getAllKeysPaginated(int pageNumber, int pageSize) {
+        return getAllKeysPaginatedWithCondition(pageNumber, pageSize, null);
+    }
+
+    /**
+     * [新增] 管理员分页获取所有许可证密钥（支持 tip_customer 条件查询）
+     * @param pageNumber 页码 (从 0 开始)
+     * @param pageSize 每页大小
+     * @param tipCustomer 客户备注条件（可为空，为空则不进行条件过滤）
+     * @return 封装好的分页结果
+     */
+    public Result<PagedResult<LicenseKey>> getAllKeysPaginatedWithCondition(int pageNumber, int pageSize, String tipCustomer) {
         try {
             // 1. 计算 offset
             int offset = pageNumber * pageSize;
 
-            // 2. 调用 Mapper 获取当前页数据和总数
-            List<LicenseKey> keys = licenseKeyMapper.findAllPaginated(pageSize, offset);
-            long totalElements = licenseKeyMapper.countAll();
+            // 2. 根据是否有条件调用不同的 Mapper 方法
+            List<LicenseKey> keys;
+            long totalElements;
+            
+            if (tipCustomer != null && !tipCustomer.trim().isEmpty()) {
+                // 有条件查询
+                keys = licenseKeyMapper.findAllPaginatedByTipCustomer(pageSize, offset, tipCustomer.trim());
+                totalElements = licenseKeyMapper.countAllByTipCustomer(tipCustomer.trim());
+                log.info("按条件查询所有 License Key，条件: {}，返回 {} 条记录", tipCustomer.trim(), keys.size());
+            } else {
+                // 无条件查询
+                keys = licenseKeyMapper.findAllPaginated(pageSize, offset);
+                totalElements = licenseKeyMapper.countAll();
+                log.info("查询所有 License Key，返回 {} 条记录", keys.size());
+            }
 
             // 3. 计算总页数
             int totalPages = (int) Math.ceil((double) totalElements / pageSize);
@@ -523,13 +545,36 @@ public class LicenseService {
      * @return 封装好的分页结果
      */
     public Result<PagedResult<LicenseKey>> getExpiredKeysPaginated(int pageNumber, int pageSize) {
+        return getExpiredKeysPaginatedWithCondition(pageNumber, pageSize, null);
+    }
+
+    /**
+     * [新增] 管理员分页获取已过期的许可证密钥（支持 tip_customer 条件查询）
+     * @param pageNumber 页码 (从 0 开始)
+     * @param pageSize 每页大小
+     * @param tipCustomer 客户备注条件（可为空，为空则不进行条件过滤）
+     * @return 封装好的分页结果
+     */
+    public Result<PagedResult<LicenseKey>> getExpiredKeysPaginatedWithCondition(int pageNumber, int pageSize, String tipCustomer) {
         try {
             // 1. 计算 offset
             int offset = pageNumber * pageSize;
 
-            // 2. 调用 Mapper 获取当前页数据和总数
-            List<LicenseKey> keys = licenseKeyMapper.findExpiredPaginated(pageSize, offset);
-            long totalElements = licenseKeyMapper.countExpired();
+            // 2. 根据是否有条件调用不同的 Mapper 方法
+            List<LicenseKey> keys;
+            long totalElements;
+            
+            if (tipCustomer != null && !tipCustomer.trim().isEmpty()) {
+                // 有条件查询
+                keys = licenseKeyMapper.findExpiredPaginatedByTipCustomer(pageSize, offset, tipCustomer.trim());
+                totalElements = licenseKeyMapper.countExpiredByTipCustomer(tipCustomer.trim());
+                log.info("按条件查询已过期 License Key，条件: {}，返回 {} 条记录", tipCustomer.trim(), keys.size());
+            } else {
+                // 无条件查询
+                keys = licenseKeyMapper.findExpiredPaginated(pageSize, offset);
+                totalElements = licenseKeyMapper.countExpired();
+                log.info("查询所有已过期 License Key，返回 {} 条记录", keys.size());
+            }
 
             // 3. 计算总页数
             int totalPages = (int) Math.ceil((double) totalElements / pageSize);
