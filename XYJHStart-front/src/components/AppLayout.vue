@@ -16,8 +16,8 @@
         </div>
         
         <el-menu-item index="/">
-          <el-icon><HomeFilled /></el-icon>
-          <span>首页</span>
+          <el-icon><User /></el-icon>
+          <span>账号买卖</span>
         </el-menu-item>
         
         <el-menu-item index="/pending-licenses">
@@ -63,8 +63,8 @@
         </div>
         
         <el-menu-item index="/" @click="drawerVisible = false">
-          <el-icon><HomeFilled /></el-icon>
-          <span>首页</span>
+          <el-icon><User /></el-icon>
+          <span>账号买卖</span>
         </el-menu-item>
         
         <el-menu-item index="/pending-licenses" @click="drawerVisible = false">
@@ -130,6 +130,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth';
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core';
 
@@ -144,7 +145,8 @@ import {
   Clock, 
   Files,
   UserFilled,
-  RefreshRight
+  RefreshRight,
+  User
 } from '@element-plus/icons-vue';
 
 const authStore = useAuthStore();
@@ -159,8 +161,10 @@ const breakpoints = useBreakpoints(breakpointsTailwind);
 // 创建一个计算属性，当屏幕宽度小于 md (768px) 断点时，isMobile 为 true
 const isMobile = breakpoints.smaller('md');
 
+const router = useRouter();
+
 const handleLogout = () => {
-  authStore.logout();
+  authStore.logout(router);
 };
 </script>
 

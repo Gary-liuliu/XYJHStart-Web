@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xyjh.xyjhstartweb.mapper.AccountXYJHMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="AccountXYJHResultMap" type="org.xyjh.xyjhstartweb.entity.AccountXYJH">
+        <id property="id" column="id"/>
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="accountName" column="account_name"/>
+        <result property="buyTime" column="buy_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="status" column="status"/>
+        <result property="sellTime" column="sell_time"/>
+        <result property="sellPrice" column="sell_price"/>
+        <result property="buyPrice" column="buy_price"/>
+        <result property="greenTicket" column="green_ticket"/>
+        <result property="yellowTicket" column="yellow_ticket"/>
+        <result property="remark" column="remark"/>
+        <result property="strongCharacter" column="strong_character"/>
+    </resultMap>
+
+    <!-- 动态更新账号信息 -->
+    <update id="updateAccountById" parameterType="org.xyjh.xyjhstartweb.entity.AccountXYJH">
+        UPDATE account_xyjh
+        <set>
+            <if test="account != null">account = #{account},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="accountName != null">account_name = #{accountName},</if>
+            <if test="buyTime != null">buy_time = #{buyTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="sellTime != null">sell_time = #{sellTime},</if>
+            <if test="sellPrice != null">sell_price = #{sellPrice},</if>
+            <if test="buyPrice != null">buy_price = #{buyPrice},</if>
+            <if test="greenTicket != null">green_ticket = #{greenTicket},</if>
+            <if test="yellowTicket != null">yellow_ticket = #{yellowTicket},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="strongCharacter != null">strong_character = #{strongCharacter},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 条件分页查询 -->
+    <select id="selectAccountsByCondition" parameterType="org.xyjh.xyjhstartweb.dto.QueryAccountXYJHRequest" 
+            resultMap="AccountXYJHResultMap">
+        SELECT * FROM account_xyjh
+        <where>
+            <if test="account != null and account != ''">
+                AND account LIKE CONCAT('%', #{account}, '%')
+            </if>
+            <if test="accountName != null and accountName != ''">
+                AND account_name LIKE CONCAT('%', #{accountName}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="remark != null and remark != ''">
+                AND remark LIKE CONCAT('%', #{remark}, '%')
+            </if>
+            <if test="strongCharacter != null and strongCharacter != ''">
+                AND strong_character LIKE CONCAT('%', #{strongCharacter}, '%')
+            </if>
+        </where>
+        ORDER BY buy_time DESC
+        <if test="page != null and size != null">
+            LIMIT #{page}, #{size}
+        </if>
+    </select>
+
+    <!-- 统计符合条件的记录数 -->
+    <select id="countAccountsByCondition" parameterType="org.xyjh.xyjhstartweb.dto.QueryAccountXYJHRequest" 
+            resultType="int">
+        SELECT COUNT(*) FROM account_xyjh
+        <where>
+            <if test="account != null and account != ''">
+                AND account LIKE CONCAT('%', #{account}, '%')
+            </if>
+            <if test="accountName != null and accountName != ''">
+                AND account_name LIKE CONCAT('%', #{accountName}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="remark != null and remark != ''">
+                AND remark LIKE CONCAT('%', #{remark}, '%')
+            </if>
+            <if test="strongCharacter != null and strongCharacter != ''">
+                AND strong_character LIKE CONCAT('%', #{strongCharacter}, '%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

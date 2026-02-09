@@ -40,12 +40,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/license/**").permitAll()
                         .requestMatchers("/account/add").permitAll()
 
-                        // 【修改点 2】: 修正并添加你前端正在使用的登录路径
+                        // 修正并添加前端正在使用的登录路径
                         .requestMatchers("/api/admin/licenses/login").permitAll()
-                        .requestMatchers("/api/admin/users/login").permitAll() // <-- 确保这个路径被允许
+                        .requestMatchers("/api/admin/users/login").permitAll()
 
                         // 其他所有管理员接口：必须认证
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/admin/**","/api/account-xyjh/**").authenticated()
                         // 任何其他未匹配的请求：全部拒绝
                         .anyRequest().denyAll()
                 )

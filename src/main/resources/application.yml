@@ -19,6 +19,7 @@ server:
   port: 9191
 # --- MyBatis 配置 ---
 mybatis:
+  mapper-locations: classpath:mapper/*.xml
   configuration:
     # ！！！在这里添加下面这行关键配置！！！
     map-underscore-to-camel-case: true

@@ -45,4 +45,10 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// 在应用初始化时也检查是否有token并设置默认headers
+const token = localStorage.getItem('token');
+if (token) {
+  api.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+}
 export default api;

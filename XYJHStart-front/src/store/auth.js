@@ -34,11 +34,15 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // 3. Action: 登出
-  function logout() {
+  function logout(router = null) {
     token.value = null;
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
-    window.location.href = '/login';
+    
+    // 如果提供了 router，则跳转到登录页
+    if (router) {
+      router.push('/login');
+    }
   }
 
   // 4. Getter: (可选) 判断是否登录
