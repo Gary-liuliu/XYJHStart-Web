@@ -44,30 +44,25 @@
       stripe
       style="width: 100%"
     >
-      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="licenseKey" label="密钥" min-width="220" />
       <el-table-column prop="status" label="状态" width="110">
         <template #default="{ row }">
           <el-tag :type="statusType(row.status)">{{ row.status }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="deviceId" label="设备ID" min-width="160" />
-      <el-table-column label="激活时间" min-width="160">
-        <template #default="{ row }">{{ formatDate(row.activationDate) }}</template>
-      </el-table-column>
+      <el-table-column prop="tipCustomer" label="客户备注" min-width="220" show-overflow-tooltip />
       <el-table-column label="创建时间" min-width="160">
         <template #default="{ row }">{{ formatDate(row.createTime) }}</template>
       </el-table-column>
       <el-table-column label="更新时间" min-width="160">
         <template #default="{ row }">{{ formatDate(row.updateTime) }}</template>
       </el-table-column>
-      <el-table-column prop="tipCustomer" label="客户备注" min-width="220" show-overflow-tooltip />
       <el-table-column label="过期时间" min-width="160">
         <template #default="{ row }">{{ formatDate(row.expirationDate) }}</template>
       </el-table-column>
 
       <!-- 新增：操作列（备注和续期） -->
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
           <el-button
             type="primary"
