@@ -182,6 +182,9 @@ import { ref, onMounted,reactive } from 'vue'
 import api from '../utils/api'
 import { ElMessage } from 'element-plus'
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('md')
@@ -195,7 +198,12 @@ const loadData = async () => {
     const res = await api.get('/api/admin/users')
     tableData.value = Array.isArray(res) ? res : []
   } catch (e) {
-    ElMessage.error(e.message || '服务器错误，无法查询管理员列表')
+    if (e.response && e.response.status === 403) {
+      ElMessage.error('权限不足或登录已过期，请重新登录')
+      router.push('/login')
+    } else {
+      ElMessage.error(e.message || '服务器错误，无法查询管理员列表')
+    }
   } finally {
     loading.value = false
   }
@@ -226,8 +234,13 @@ const deleteUser = async (id) => {
     ElMessage.success('删除成功')
     await loadData()
   } catch (e) {
-    // 后端可能返回：不能删除自己(400)、用户不存在(404)
-    ElMessage.error(e.message || '删除失败')
+    if (e.response && e.response.status === 403) {
+      ElMessage.error('权限不足或登录已过期，请重新登录')
+      router.push('/login')
+    } else {
+      // 后端可能返回：不能删除自己(400)、用户不存在(404)
+      ElMessage.error(e.message || '删除失败')
+    }
   } finally {
     deleteLoadingId.value = null
   }
@@ -267,8 +280,13 @@ const submitCreateAdmin = async () => {
       createDialogVisible.value = false
       await loadData()
     } catch (e) {
-      // 可能返回409：用户名已存在
-      ElMessage.error(e.message || '创建失败')
+      if (e.response && e.response.status === 403) {
+        ElMessage.error('权限不足或登录已过期，请重新登录')
+        router.push('/login')
+      } else {
+        // 可能返回409：用户名已存在
+        ElMessage.error(e.message || '创建失败')
+      }
     } finally {
       createSubmitting.value = false
     }
@@ -320,8 +338,13 @@ const submitChangePwd = async () => {
       ElMessage.success('密码修改成功')
       pwdDialogVisible.value = false
     } catch (e) {
-      // 后端失败示例：code=400, message="旧密码错误"
-      ElMessage.error(e.message || '修改失败')
+      if (e.response && e.response.status === 403) {
+        ElMessage.error('权限不足或登录已过期，请重新登录')
+        router.push('/login')
+      } else {
+        // 后端失败示例：code=400, message="旧密码错误"
+        ElMessage.error(e.message || '修改失败')
+      }
     } finally {
       pwdSubmitting.value = false
     }

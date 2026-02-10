@@ -515,21 +515,25 @@ const getPasswordDisplay = (password) => {
   return password || '-'
 }
 
-// 计算火星哥：购入金额 + (售出金额 - 购入金额) / 2
+// 计算火星哥：购入金额 + ((售出金额 - 手续费) - 购入金额) / 2
 const calculateHuoxingge = (row) => {
   if (row.sellPrice == null || row.sellPrice === undefined || row.sellPrice === 0) {
     return '-';
   }
-  const result = row.buyPrice + (row.sellPrice - row.buyPrice) / 2;
+  const fee = row.sellPrice * 0.006; // 计算手续费为售出金额的0.006倍
+  const adjustedSellPrice = row.sellPrice - fee; // 扣除手续费
+  const result = row.buyPrice + (adjustedSellPrice - row.buyPrice) / 2;
   return isNaN(result) ? '-' : `¥${result.toFixed(2)}`;
 }
 
-// 计算卡卡：(售出金额 - 购入金额) / 2
+// 计算卡卡：((售出金额 - 手续费) - 购入金额) / 2
 const calculateKaka = (row) => {
   if (row.sellPrice == null || row.sellPrice === undefined || row.sellPrice === 0) {
     return '-';
   }
-  const result = (row.sellPrice - row.buyPrice) / 2;
+  const fee = row.sellPrice * 0.006; // 计算手续费为售出金额的0.006倍
+  const adjustedSellPrice = row.sellPrice - fee; // 扣除手续费
+  const result = (adjustedSellPrice - row.buyPrice) / 2;
   return isNaN(result) ? '-' : `¥${result.toFixed(2)}`;
 }
 
@@ -635,6 +639,10 @@ const rules = {
   ],
   buyTime: [
     { required: true, message: '请选择购入时间', trigger: 'change' }
+  ],
+  buyPrice: [
+    { required: true, message: '请输入购入价格', trigger: 'blur' },
+    { type: 'number', min: 0, message: '价格不能小于0', trigger: 'blur' }
   ]
 }
 

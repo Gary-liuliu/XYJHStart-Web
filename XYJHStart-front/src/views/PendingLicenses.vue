@@ -142,6 +142,9 @@ import { ref, onMounted, reactive } from 'vue'
 import api from '../utils/api'
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const loading = ref(false)
 const tableData = ref([])
@@ -164,7 +167,12 @@ const loadData = async () => {
     tableData.value = res.content || []
     total.value = res.totalElements || 0
   } catch (e) {
-    ElMessage.error(e.message || '加载待审核许可证失败')
+    if (e.response && e.response.status === 403) {
+      ElMessage.error('权限不足或登录已过期，请重新登录')
+      router.push('/login')
+    } else {
+      ElMessage.error(e.message || '加载待审核许可证失败')
+    }
   } finally {
     loading.value = false
   }
@@ -237,7 +245,12 @@ const submitApprove = async () => {
       approveDialogVisible.value = false
       loadData()
     } catch (e) {
-      ElMessage.error(e.message || '批准失败')
+      if (e.response && e.response.status === 403) {
+        ElMessage.error('权限不足或登录已过期，请重新登录')
+        router.push('/login')
+      } else {
+        ElMessage.error(e.message || '批准失败')
+      }
     } finally {
       approveSubmitting.value = false
     }
