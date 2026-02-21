@@ -71,13 +71,14 @@
             {{ row.greenTicket }}
             <el-icon><EditPen /></el-icon>
           </span>
-          <el-input-number v-else
-                           v-model="editingTicket.value"
-                           :min="0"
-                           size="small"
-                           @blur="saveTicketValue(editingTicket.id, 'green', editingTicket.value); editingTicket.id = null"
-                           @keyup.enter="saveTicketValue(editingTicket.id, 'green', editingTicket.value); editingTicket.id = null"
-                           @keyup.escape="editingTicket.id = null; row.greenTicket" />
+          <el-input v-else
+                    v-model="editingTicket.value"
+                    size="small"
+                    ref="greenTicketInput"
+                    @blur="saveTicketValue(editingTicket.id, 'green', editingTicket.value); editingTicket.id = null"
+                    @keyup.enter="saveTicketValue(editingTicket.id, 'green', editingTicket.value); editingTicket.id = null"
+                    @keyup.escape="editingTicket.id = null; row.greenTicket"
+                    @focus="$event.target.select()" />
         </template>
       </el-table-column>
       <el-table-column prop="yellowTicket" label="黄票" min-width="100">
@@ -88,13 +89,14 @@
             {{ row.yellowTicket }}
             <el-icon><EditPen /></el-icon>
           </span>
-          <el-input-number v-else
-                           v-model="editingTicket.value"
-                           :min="0"
-                           size="small"
-                           @blur="saveTicketValue(editingTicket.id, 'yellow', editingTicket.value); editingTicket.id = null"
-                           @keyup.enter="saveTicketValue(editingTicket.id, 'yellow', editingTicket.value); editingTicket.id = null"
-                           @keyup.escape="editingTicket.id = null; row.yellowTicket" />
+          <el-input v-else
+                    v-model="editingTicket.value"
+                    size="small"
+                    ref="yellowTicketInput"
+                    @blur="saveTicketValue(editingTicket.id, 'yellow', editingTicket.value); editingTicket.id = null"
+                    @keyup.enter="saveTicketValue(editingTicket.id, 'yellow', editingTicket.value); editingTicket.id = null"
+                    @keyup.escape="editingTicket.id = null; row.yellowTicket"
+                    @focus="$event.target.select()" />
         </template>
       </el-table-column>
       <el-table-column prop="sellTime" label="售出时间" min-width="160">
@@ -103,7 +105,24 @@
       <el-table-column prop="sellPrice" label="售出价格" min-width="100">
         <template #default="{ row }">{{ row.sellPrice !== null && row.sellPrice !== undefined && row.sellPrice !== 0 ? `¥${row.sellPrice}` : '-' }}</template>
       </el-table-column>
-      <el-table-column prop="strongCharacter" label="强力角色" min-width="120" show-overflow-tooltip />
+      <el-table-column prop="strongCharacter" label="强力角色" min-width="120" show-overflow-tooltip>
+        <template #default="{ row }">
+          <span v-if="editingStrongCharacter.id !== row.id" 
+                @dblclick="startEditingStrongCharacter(row)"
+                style="cursor: pointer;">
+            {{ row.strongCharacter || '-' }}
+            <el-icon><EditPen /></el-icon>
+          </span>
+          <el-input v-else
+                    v-model="editingStrongCharacter.value"
+                    size="small"
+                    ref="strongCharacterInput"
+                    @blur="saveStrongCharacter(editingStrongCharacter.id, editingStrongCharacter.value); editingStrongCharacter.id = null"
+                    @keyup.enter="saveStrongCharacter(editingStrongCharacter.id, editingStrongCharacter.value); editingStrongCharacter.id = null"
+                    @keyup.escape="editingStrongCharacter.id = null; row.strongCharacter"
+                    @focus="$event.target.select()" />
+        </template>
+      </el-table-column>
       <el-table-column prop="remark" label="备注" min-width="160" show-overflow-tooltip />
       <el-table-column prop="huoxingge" label="火星哥" min-width="120">
         <template #default="{ row }">{{ calculateHuoxingge(row) }}</template>
@@ -422,6 +441,12 @@ const tableData = ref([])
 const editingTicket = ref({
   id: null,
   type: null, // 'green' 或 'yellow'
+  value: null
+})
+
+// 双击编辑强力角色相关
+const editingStrongCharacter = ref({
+  id: null,
   value: null
 })
 
@@ -759,6 +784,30 @@ const startEditingTicket = (row, ticketType) => {
     type: ticketType,
     value: ticketType === 'green' ? row.greenTicket : row.yellowTicket
   }
+  // 延迟聚焦以确保DOM更新完成
+  setTimeout(() => {
+    const input = ticketType === 'green' ? document.querySelector('[ref="greenTicketInput"] input') : document.querySelector('[ref="yellowTicketInput"] input')
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  }, 0)
+}
+
+// 开始编辑强力角色
+const startEditingStrongCharacter = (row) => {
+  editingStrongCharacter.value = {
+    id: row.id,
+    value: row.strongCharacter || ''
+  }
+  // 延迟聚焦以确保DOM更新完成
+  setTimeout(() => {
+    const input = document.querySelector('[ref="strongCharacterInput"] input')
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  }, 0)
 }
 
 // 保存票券值到后端
@@ -789,6 +838,33 @@ const saveTicketValue = async (id, ticketType, value) => {
   } catch (error) {
     console.error(`更新${ticketType === 'green' ? '绿票' : '黄票'}失败:`, error)
     ElMessage.error(`${ticketType === 'green' ? '绿票' : '黄票'}更新失败`)
+    
+    if (error.response && error.response.status === 403) {
+      ElMessage.error('权限不足或登录已过期，请重新登录')
+      router.push('/login')
+    }
+  }
+}
+
+// 保存强力角色到后端
+const saveStrongCharacter = async (id, value) => {
+  try {
+    const updateData = {
+      id: id,
+      strongCharacter: value
+    }
+    
+    await api.put('/api/account-xyjh/update', updateData)
+    ElMessage.success('强力角色更新成功')
+    
+    // 更新本地数据
+    const row = tableData.value.find(item => item.id === id)
+    if (row) {
+      row.strongCharacter = value
+    }
+  } catch (error) {
+    console.error('更新强力角色失败:', error)
+    ElMessage.error('强力角色更新失败')
     
     if (error.response && error.response.status === 403) {
       ElMessage.error('权限不足或登录已过期，请重新登录')

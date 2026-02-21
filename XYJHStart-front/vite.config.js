@@ -1,11 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// --- 下面是新增的代码 ---
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-// --- 新增代码结束 ---
 
 export default defineConfig({
   plugins: [
