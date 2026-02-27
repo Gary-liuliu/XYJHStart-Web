@@ -6,9 +6,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.xyjh.xyjhstartweb.dto.ActivationRequest;
+import org.xyjh.xyjhstartweb.dto.Role;
+import org.xyjh.xyjhstartweb.mapper.LicenseKeyMapper;
 import org.xyjh.xyjhstartweb.service.AccountInfoService;
 import org.xyjh.xyjhstartweb.service.LicenseService;
 import org.xyjh.xyjhstartweb.util.Result;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/license") // 为所有与许可证相关的API设置一个统一的基础路径
@@ -55,5 +59,31 @@ public class LicenseController {
             return licenseService.validateToken(jwt);
         }
         return Result.fail(400, "无效的请求头"); // 400 Bad Request
+    }
+
+    /**
+     * 获取所有角色数据
+     * GET /api/roles
+     */
+    @GetMapping("/roles")
+    public Result<List<Role>> getAllRoles() {
+        try {
+            List<Role> roles = licenseService.selectAllRoles();
+            return Result.success(roles);
+        } catch (Exception e) {
+            // 记录日志并返回错误
+            return Result.fail(500, "获取角色列表失败");
+        }
+    }
+
+    @GetMapping("/rolenames")
+    public Result<List<Role>> getAllRoleNames() {
+        try {
+            List<Role> roles = licenseService.selectAllRoles();
+            return Result.success(roles);
+        } catch (Exception e) {
+            // 记录日志并返回错误
+            return Result.fail(500, "获取角色名字列表失败");
+        }
     }
 }

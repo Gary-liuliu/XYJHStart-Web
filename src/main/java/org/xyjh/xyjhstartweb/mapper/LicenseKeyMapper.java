@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.*;
+import org.xyjh.xyjhstartweb.dto.Artifact;
+import org.xyjh.xyjhstartweb.dto.Role;
 import org.xyjh.xyjhstartweb.entity.LicenseKey;
 
 import java.util.Date;
@@ -287,4 +289,13 @@ public interface LicenseKeyMapper {
      */
     @Update("UPDATE license_key SET tip_customer = #{tipCustomer} WHERE id = #{id}")
     int updateNote(@Param("id") Long id, @Param("tipCustomer") String tipCustomer);
+
+    @Select("SELECT id, name, base_attack, base_defense, base_hp, base_speed, training_speed FROM role")
+    List<Role> selectAllRoles();
+
+    @Select("SELECT name FROM role")
+    List<Role> selectAllRoleNames();
+
+    @Select("SELECT id, name FROM artifact")
+    List<Artifact> selectAllArtifacts();
 }

@@ -614,4 +614,11 @@ public class LicenseService {
         return Result.success("备注更新成功", licenseKeyMapper.findById(keyId));
     }
 
+    public List<Role> selectAllRoles(){
+        return licenseKeyMapper.selectAllRoles();
+    }
+
+    public List<Role> selectAllRoleNames(){
+        return licenseKeyMapper.selectAllRoleNames();
+    }
 }

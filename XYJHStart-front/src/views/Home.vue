@@ -43,6 +43,7 @@
       stripe
       :row-class-name="tableRowClassName"
       :row-key="getRowKey"
+      :key="tableKey"
       style="width: 100%"
     >
       <el-table-column prop="accountName" label="账号名" min-width="120" />
@@ -436,6 +437,7 @@ const router = useRouter()
 const locale = zhCn
 const loading = ref(false)
 const tableData = ref([])
+const tableKey = ref(0)
 
 // 双击编辑票券相关
 const editingTicket = ref({
@@ -473,6 +475,8 @@ const loadData = async () => {
     // 响应拦截器已经处理了Result包装，直接使用response即可
     tableData.value = response.content || response.records || response
     total.value = response.totalElements || response.total || 0
+    // 更新表格key以强制刷新样式
+    tableKey.value++
   } catch (e) {
     console.error('加载账号失败:', e)
     if (e.response && e.response.status === 403) {
@@ -963,8 +967,12 @@ const getRowKey = (row) => {
 
 // 根据状态设置行颜色
 const tableRowClassName = ({ row }) => {
-  // 确保状态值是数字类型
-  const status = Number(row.status);
+  // 确保状态值是数字类型，处理可能的null/undefined情况
+  let status = row.status;
+  if (status === null || status === undefined) {
+    status = 0;
+  }
+  status = Number(status);
   
   if (status === 0) {
     return 'status-brushing' // 刷票中 - 浅灰色
@@ -995,20 +1003,20 @@ onMounted(loadData)
 }
 
 /* 根据状态设置表格行颜色 */
-:deep(.el-table .status-brushing) {
-  background-color: #f5f5f5; /* 刷票中 - 浅灰色 */
+:deep(.el-table__body tr.status-brushing > td) {
+  background-color: #f5f5f5 !important; /* 刷票中 - 浅灰色 */
 }
 
-:deep(.el-table .status-selling) {
-  background-color: #e3f2fd; /* 出售中 - 淡蓝色 */
+:deep(.el-table__body tr.status-selling > td) {
+  background-color: #e3f2fd !important; /* 出售中 - 淡蓝色 */
 }
 
-:deep(.el-table .status-pending) {
-  background-color: #fff3e0; /* 出售未收货 - 橙色 */
+:deep(.el-table__body tr.status-pending > td) {
+  background-color: #fff3e0 !important; /* 出售未收货 - 橙色 */
 }
 
-:deep(.el-table .status-completed) {
-  background-color: #e8f5e8; /* 出售完成 - 淡绿色 */
+:deep(.el-table__body tr.status-completed > td) {
+  background-color: #e8f5e8 !important; /* 出售完成 - 淡绿色 */
 }
 .search-controls {
   margin-bottom: 16px;
