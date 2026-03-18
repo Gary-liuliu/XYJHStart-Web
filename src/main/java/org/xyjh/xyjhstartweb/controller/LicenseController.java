@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.xyjh.xyjhstartweb.dto.ActivationRequest;
+import org.xyjh.xyjhstartweb.dto.AppConfigRequest;
 import org.xyjh.xyjhstartweb.dto.Role;
+import org.xyjh.xyjhstartweb.entity.AppConfigItem;
 import org.xyjh.xyjhstartweb.mapper.LicenseKeyMapper;
 import org.xyjh.xyjhstartweb.service.AccountInfoService;
 import org.xyjh.xyjhstartweb.service.LicenseService;
@@ -85,5 +87,27 @@ public class LicenseController {
             // 记录日志并返回错误
             return Result.fail(500, "获取角色名字列表失败");
         }
+    }
+
+    /**
+     * [新增] 根据配置类型查询最近的 10 条记录
+     * GET /api/license/configs/recent?type=1
+     * @param type 配置类型：1 兑换码，2 活动代码
+     * @return 返回配置项列表
+     */
+    @GetMapping("/configs/recent")
+    public Result<List<AppConfigItem>> getRecentConfigs(@RequestParam Integer type) {
+        return licenseService.getRecentConfigsByType(type);
+    }
+
+    /**
+     * [新增] 新增一条配置记录
+     * POST /api/license/configs
+     * @param request 包含配置类型和配置值的请求体
+     * @return 返回新增结果
+     */
+    @PostMapping("/configs")
+    public Result<AppConfigItem> addConfig(@RequestBody AppConfigRequest request) {
+        return licenseService.addConfig(request);
     }
 }

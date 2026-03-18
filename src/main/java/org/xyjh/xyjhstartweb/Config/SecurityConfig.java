@@ -43,6 +43,11 @@ public class SecurityConfig {
                         // 修正并添加前端正在使用的登录路径
                         .requestMatchers("/api/admin/licenses/login").permitAll()
                         .requestMatchers("/api/admin/users/login").permitAll()
+                        
+                        // 文件访问接口：全部放行
+                        .requestMatchers("/api/files/**").permitAll()
+                        // 静态文件访问：全部放行
+                        .requestMatchers("/files/**").permitAll()
 
                         // 其他所有管理员接口：必须认证
                         .requestMatchers("/api/admin/**","/api/account-xyjh/**").authenticated()

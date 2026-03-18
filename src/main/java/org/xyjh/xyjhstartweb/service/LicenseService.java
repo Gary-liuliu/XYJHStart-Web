@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.xyjh.xyjhstartweb.dto.*;
+import org.xyjh.xyjhstartweb.entity.AppConfigItem;
 import org.xyjh.xyjhstartweb.entity.LicenseKey;
 import org.xyjh.xyjhstartweb.mapper.LicenseKeyMapper;
 import org.xyjh.xyjhstartweb.util.Result;
@@ -16,6 +17,7 @@ import org.xyjh.xyjhstartweb.util.jwt.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.xyjh.xyjhstartweb.entity.AdminUser;
 import org.xyjh.xyjhstartweb.mapper.AdminUserMapper;
+import org.xyjh.xyjhstartweb.mapper.AppConfigItemMapper;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,6 +32,9 @@ public class LicenseService {
 
     @Autowired
     private LicenseKeyMapper licenseKeyMapper;
+
+    @Autowired
+    private AppConfigItemMapper appConfigItemMapper;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -620,5 +625,76 @@ public class LicenseService {
 
     public List<Role> selectAllRoleNames(){
         return licenseKeyMapper.selectAllRoleNames();
+    }
+
+    /**
+     * [新增] 根据配置类型查询最近的记录
+     * - 类型 1（兑换码）：查询最近 10 条
+     * - 类型 2（活动代码）：查询最近 1 条
+     * @param configType 配置类型：1 兑换码，2 活动代码
+     * @return 返回配置项列表
+     */
+    public Result<List<AppConfigItem>> getRecentConfigsByType(Integer configType) {
+        try {
+            if (configType == null || (configType != 1 && configType != 2)) {
+                return Result.fail(400, "无效的配置类型，请输入 1（兑换码）或 2（活动代码）");
+            }
+            
+            List<AppConfigItem> configs;
+            if (configType == 2) {
+                // 类型 2（活动代码）只查询一条
+                AppConfigItem latest = appConfigItemMapper.findLatestByType(configType);
+                configs = latest != null ? java.util.Collections.singletonList(latest) : new java.util.ArrayList<>();
+                log.info("查询配置类型 {} 的最新 1 条记录", configType);
+            } else {
+                // 类型 1（兑换码）查询 10 条
+                configs = appConfigItemMapper.findRecentByType(configType);
+                log.info("查询配置类型 {} 的最近 10 条记录，返回 {} 条", configType, configs.size());
+            }
+            
+            return Result.success("查询成功", configs);
+        } catch (Exception e) {
+            log.error("查询配置项时出错", e);
+            return Result.fail(500, "查询失败，服务器错误");
+        }
+    }
+
+    /**
+     * [新增] 新增一条配置记录
+     * @param request 包含配置类型和配置值的请求对象
+     * @return 返回新增结果
+     */
+    public Result<AppConfigItem> addConfig(AppConfigRequest request) {
+        try {
+            if (request.getConfigType() == null || (request.getConfigType() != 1 && request.getConfigType() != 2)) {
+                return Result.fail(400, "无效的配置类型，请输入 1（兑换码）或 2（活动代码）");
+            }
+            if (request.getConfigValue() == null || request.getConfigValue().trim().isEmpty()) {
+                return Result.fail(400, "配置值不能为空");
+            }
+
+            // 先检查数据库中是否已存在相同的配置
+            AppConfigItem existingConfig = appConfigItemMapper.findByTypeAndValue(
+                request.getConfigType(), 
+                request.getConfigValue().trim()
+            );
+            
+            if (existingConfig != null) {
+                log.warn("新增失败：配置已存在，类型：{}, 值：{}", request.getConfigType(), request.getConfigValue());
+                return Result.fail(409, "该配置已存在，请勿重复添加");
+            }
+
+            AppConfigItem configItem = new AppConfigItem();
+            configItem.setConfigType(request.getConfigType());
+            configItem.setConfigValue(request.getConfigValue().trim());
+
+            appConfigItemMapper.insert(configItem);
+            log.info("成功新增配置项，类型：{}, 值：{}", configItem.getConfigType(), configItem.getConfigValue());
+            
+            return Result.success("新增成功", configItem);
+        } catch (Exception e) {
+            log.error("新增配置项时出错", e);
+            return Result.fail(500, "新增失败，数据库错误");
+        }
     }
 }

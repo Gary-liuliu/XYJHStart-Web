@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .upload-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .upload-section:hover {
+            border-color: #007bff;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .file-info {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .config-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 文件上传测试</h1>
+        
+        <div class="config-info">
+            <h3>📋 上传配置信息</h3>
+            <div id="config-info">加载中...</div>
+        </div>
+
+        <div class="upload-section">
+            <h3>📤 单文件上传</h3>
+            <input type="file" id="singleFile" accept="image/*,video/*" />
+            <br>
+            <button onclick="uploadSingleFile()">上传文件</button>
+        </div>
+
+        <div class="upload-section">
+            <h3>📦 批量上传 (最多10个)</h3>
+            <input type="file" id="multipleFiles" multiple accept="image/*,video/*" />
+            <br>
+            <button onclick="uploadMultipleFiles()">批量上传</button>
+        </div>
+
+        <div class="upload-section">
+            <h3>🗑️ 文件删除</h3>
+            <input type="text" id="deletePath" placeholder="请输入文件URL" style="width: 300px;" />
+            <br>
+            <button onclick="deleteFile()">删除文件</button>
+        </div>
+
+        <div id="result" class="result"></div>
+        <div id="preview-area"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:9191/api/files';
+        
+        // 页面加载时获取配置信息
+        window.onload = function() {
+            loadConfigInfo();
+        };
+
+        // 加载配置信息
+        async function loadConfigInfo() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/config`);
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const config = result.data;
+                    document.getElementById('config-info').innerHTML = `
+                        <p><strong>最大文件大小:</strong> ${config.maxSize}</p>
+                        <p><strong>支持的图片格式:</strong> ${config.allowedImageTypes.join(', ')}</p>
+                        <p><strong>支持的视频格式:</strong> ${config.allowedVideoTypes.join(', ')}</p>
+                        <p><strong>批量上传限制:</strong> 最多${config.maxBatchCount}个文件</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('获取配置信息失败:', error);
+                document.getElementById('config-info').innerHTML = '<p style="color: red;">获取配置信息失败</p>';
+            }
+        }
+
+        // 显示结果
+        function showResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = message;
+            resultDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 显示预览
+        function showPreview(url, fileName, fileType) {
+            const previewArea = document.getElementById('preview-area');
+            let previewHtml = '<h3>预览区域</h3>';
+            
+            if (fileType.startsWith('image/')) {
+                previewHtml += `<img src="${url}" alt="${fileName}" class="preview" />`;
+            } else if (fileType.startsWith('video/')) {
+                previewHtml += `<video controls class="preview"><source src="${url}" type="${fileType}">您的浏览器不支持视频播放。</video>`;
+            }
+            
+            previewHtml += `<div class="file-info">
+                <strong>文件名:</strong> ${fileName}<br>
+                <strong>文件类型:</strong> ${fileType}<br>
+                <strong>访问地址:</strong> <a href="${url}" target="_blank">${url}</a>
+            </div>`;
+            
+            previewArea.innerHTML = previewHtml;
+        }
+
+        // 单文件上传
+        async function uploadSingleFile() {
+            const fileInput = document.getElementById('singleFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showResult('请选择要上传的文件', false);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showResult(`✅ 文件上传成功！`);
+                    showPreview(result.data.url, result.data.fileName, result.data.fileType);
+                } else {
+                    showResult(`❌ 上传失败: ${result.message}`, false);
+                }
+            } catch (error) {
+                console.error('上传错误:', error);
+                showResult(`❌ 上传异常: ${error.message}`, false);
+            }
+        }
+
+        // 批量上传
+        async function uploadMultipleFiles() {
+            const fileInput = document.getElementById('multipleFiles');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                showResult('请选择要上传的文件', false);
+                return;
+            }
+
+            if (files.length > 10) {
+                showResult('最多只能同时上传10个文件', false);
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/upload/batch`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    let message = `✅ 批量上传成功！共上传 ${result.data.length} 个文件`;
+                    if (result.message) {
+                        message += `<br><small>${result.message}</small>`;
+                    }
+                    
+                    showResult(message);
+                    
+                    // 显示第一个文件的预览
+                    if (result.data.length > 0) {
+                        const firstFile = result.data[0];
+                        showPreview(firstFile.url, firstFile.fileName, firstFile.fileType);
+                    }
+                } else {
+                    showResult(`❌ 批量上传失败: ${result.message}`, false);
+                }
+            } catch (error) {
+                console.error('批量上传错误:', error);
+                showResult(`❌ 批量上传异常: ${error.message}`, false);
+            }
+        }
+
+        // 删除文件
+        async function deleteFile() {
+            const filePath = document.getElementById('deletePath').value.trim();
+            
+            if (!filePath) {
+                showResult('请输入要删除的文件URL', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filePath: filePath
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showResult(`✅ 文件删除成功！`);
+                    document.getElementById('preview-area').innerHTML = '';
+                    document.getElementById('deletePath').value = '';
+                } else {
+                    showResult(`❌ 删除失败: ${result.message}`, false);
+                }
+            } catch (error) {
+                console.error('删除错误:', error);
+                showResult(`❌ 删除异常: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>
