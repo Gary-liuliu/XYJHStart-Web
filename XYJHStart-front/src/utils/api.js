@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { clearAuthState, getToken, isTokenExpired } from './authToken'
+import { goToLogin } from './navigation'
 
 const api = axios.create({
   baseURL: '/',
@@ -11,9 +12,7 @@ function isLoginRequest(url = '') {
 }
 
 function redirectToLogin() {
-  if (window.location.pathname !== '/login') {
-    window.location.assign('/login')
-  }
+  goToLogin()
 }
 
 function handleUnauthorized() {

@@ -7,6 +7,7 @@ import 'element-plus/dist/index.css'
 
 // 2. 导入我们刚刚创建的 router
 import router from './router'
+import { setAppRouter } from './utils/navigation'
 
 // 3. 导入 Pinia
 import { createPinia } from 'pinia'
@@ -15,6 +16,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 // 4. 创建 Pinia 实例
 const pinia = createPinia()
+setAppRouter(router)
 
 // 5. 创建 Vue 应用实例
 const app = createApp(App)
