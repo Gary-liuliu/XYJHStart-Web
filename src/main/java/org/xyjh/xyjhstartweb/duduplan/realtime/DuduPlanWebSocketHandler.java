@@ -20,6 +20,7 @@ import org.xyjh.xyjhstartweb.duduplan.service.DuduPlanChatService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -77,6 +78,10 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
         }
         String type = payload.path("type").asText("");
         if (state.role == null) {
+            if (!"authenticate".equals(type)) {
+                closeQuietly(state.session, AUTHENTICATION_FAILED);
+                return;
+            }
             authenticate(state, type, payload);
             return;
         }
@@ -127,11 +132,11 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
             DuduPlanTokenService.TokenClaims claims = tokenService.parseAccessToken(payload.path("accessToken").asText());
             state.role = claims.role();
             state.accessTokenExpiresAt = claims.expiresAt();
-            sessionRegistry.register(state.role, state.session);
-            sessionRegistry.sendToRole(state.role, Map.of(
+            state.session.sendMessage(new TextMessage(objectMapper.writeValueAsString(Map.of(
                     "protocolVersion", 2, "type", "authenticated", "role", state.role.value(),
                     "serverTime", System.currentTimeMillis(), "accessTokenExpiresAt", state.accessTokenExpiresAt
-            ));
+            ))));
+            sessionRegistry.register(state.role, state.session);
         } catch (Exception exception) {
             closeQuietly(state.session, AUTHENTICATION_FAILED);
         }
@@ -139,7 +144,7 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
 
     private void handleAuthenticatedMessage(ConnectionState state, String type, JsonNode payload) {
         switch (type) {
-            case "heartbeat" -> sessionRegistry.sendToRole(state.role, Map.of(
+            case "heartbeat" -> sessionRegistry.sendToSession(state.session, Map.of(
                     "protocolVersion", 2, "type", "heartbeat", "sentAt", System.currentTimeMillis()
             ));
             case "chat_message" -> handleChatMessage(state, payload);
@@ -150,19 +155,20 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     private void handleChatMessage(ConnectionState state, JsonNode payload) {
+        String messageId = payload.path("messageId").isTextual() ? payload.path("messageId").asText() : null;
         try {
             ChatMessageRequest request = objectMapper.treeToValue(payload, ChatMessageRequest.class);
             ChatMessageResponse saved = chatService.saveMessage(state.role, request);
-            sessionRegistry.sendToRole(state.role, Map.of(
+            sessionRegistry.sendToSession(state.session, Map.of(
                     "protocolVersion", 2, "type", "chat_saved", "message", saved
             ));
             sessionRegistry.sendToRole(state.role.peer(), Map.of(
                     "protocolVersion", 2, "type", "chat_message", "message", saved
             ));
         } catch (DuduPlanApiException exception) {
-            sendError(state, exception.getError());
+            sendError(state, exception.getError(), messageId);
         } catch (Exception exception) {
-            sendError(state, "invalid_chat_message");
+            sendError(state, "invalid_chat_message", messageId);
         }
     }
 
@@ -191,9 +197,15 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
             case "snapshot" -> payload.path("snapshotId").isTextual()
                     && payload.path("chunkIndex").canConvertToInt()
                     && payload.path("chunkCount").canConvertToInt()
+                    && payload.path("chunkIndex").asInt() >= 0
+                    && payload.path("chunkCount").asInt() > 0
+                    && payload.path("chunkIndex").asInt() < payload.path("chunkCount").asInt()
                     && payload.path("sessions").isArray();
-            case "session_upsert" -> payload.has("session") && payload.path("session").path("sessionId").isTextual()
-                    && payload.path("session").path("updatedAt").isNumber();
+            case "session_upsert" -> payload.has("session")
+                    && (payload.path("session").path("sessionId").isTextual()
+                    || payload.path("session").path("id").isTextual())
+                    && (payload.path("session").path("updatedAt").isNumber()
+                    || payload.path("session").path("updatedAt").isTextual());
             case "workout_event" -> payload.path("eventId").isTextual() && payload.path("sessionId").isTextual()
                     && payload.path("eventType").isTextual();
             default -> false;
@@ -205,18 +217,24 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     private void sendError(ConnectionState state, String error) {
+        sendError(state, error, null);
+    }
+
+    private void sendError(ConnectionState state, String error, String messageId) {
+        Map<String, Object> event = new LinkedHashMap<>();
+        event.put("protocolVersion", 2);
+        event.put("type", "error");
+        event.put("error", error);
+        event.put("serverTime", System.currentTimeMillis());
+        if (messageId != null && !messageId.isBlank()) {
+            event.put("messageId", messageId);
+        }
         if (state.role != null) {
-            sessionRegistry.sendToRole(state.role, Map.of(
-                    "protocolVersion", 2, "type", "error", "error", error,
-                    "serverTime", System.currentTimeMillis()
-            ));
+            sessionRegistry.sendToSession(state.session, event);
             return;
         }
         try {
-            state.session.sendMessage(new TextMessage(objectMapper.writeValueAsString(Map.of(
-                    "protocolVersion", 2, "type", "error", "error", error,
-                    "serverTime", System.currentTimeMillis()
-            ))));
+            state.session.sendMessage(new TextMessage(objectMapper.writeValueAsString(event)));
         } catch (IOException exception) {
             closeQuietly(state.session, CloseStatus.SERVER_ERROR);
         }

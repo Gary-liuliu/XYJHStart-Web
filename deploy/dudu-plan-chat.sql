@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS dudu_chat_message (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    message_id CHAR(36) NOT NULL,
+    sender_role VARCHAR(16) NOT NULL,
+    receiver_role VARCHAR(16) NOT NULL,
+    message_type VARCHAR(32) NOT NULL,
+    content TEXT NOT NULL,
+    reply_to_message_id CHAR(36) NULL,
+    client_created_at BIGINT NOT NULL,
+    server_created_at BIGINT NOT NULL,
+    delivered_at BIGINT NULL,
+    read_at BIGINT NULL,
+    recalled_at BIGINT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_dudu_chat_message_message_id (message_id),
+    KEY idx_dudu_chat_message_receiver_id (receiver_role, id),
+    KEY idx_dudu_chat_message_unread (receiver_role, read_at, recalled_at, id),
+    CONSTRAINT chk_dudu_chat_sender_role CHECK (sender_role IN ('owner', 'observer')),
+    CONSTRAINT chk_dudu_chat_receiver_role CHECK (receiver_role IN ('owner', 'observer')),
+    CONSTRAINT chk_dudu_chat_message_type CHECK (message_type IN ('text', 'encouragement'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

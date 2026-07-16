@@ -1,27 +1,478 @@
-2026-06-16 19:01:39.979 - INFO --- [restartedMain] o.x.x.XyjhStartWebApplication            : Starting XyjhStartWebApplication using Java 17.0.17 with PID 10244 (D:\XYJH\XYJHStart-Web\target\classes started by Administrator in D:\XYJH\XYJHStart-Web)
-2026-06-16 19:01:39.984 -DEBUG --- [restartedMain] o.x.x.XyjhStartWebApplication            : Running with Spring Boot v3.4.0, Spring v6.2.0
-2026-06-16 19:01:39.985 - INFO --- [restartedMain] o.x.x.XyjhStartWebApplication            : No active profile set, falling back to 1 default profile: "default"
-2026-06-16 19:01:40.008 - INFO --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-06-16 19:01:40.008 - INFO --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-06-16 19:01:40.292 - INFO --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
-2026-06-16 19:01:40.303 - INFO --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 8 ms. Found 0 JDBC repository interfaces.
-2026-06-16 19:01:40.569 - INFO --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 9191 (http)
-2026-06-16 19:01:40.577 - INFO --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-06-16 19:01:40.578 - INFO --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
-2026-06-16 19:01:40.601 - INFO --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-06-16 19:01:40.601 - INFO --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 591 ms
-2026-06-16 19:01:40.626 -DEBUG --- [restartedMain] o.x.x.Config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
-2026-06-16 19:01:40.802 - WARN --- [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-07-16 19:26:14.985 - WARN --- [main] ory$DuplicateJsonObjectContextCustomizer : 
 
-Using generated security password: 1641c174-8576-4ddf-8cf3-9394e666963c
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/Administrator/.m2/repository/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/Administrator/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-07-16 19:26:15.004 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Starting XyjhStartWebApplicationTests using Java 17.0.17 with PID 7676 (started by Administrator in D:\XYJHStart-Web)
+2026-07-16 19:26:15.005 -DEBUG --- [main] o.x.x.XyjhStartWebApplicationTests       : Running with Spring Boot v3.4.0, Spring v6.2.0
+2026-07-16 19:26:15.006 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : No active profile set, falling back to 1 default profile: "default"
+2026-07-16 19:26:15.442 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2026-07-16 19:26:15.455 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 6 ms. Found 0 JDBC repository interfaces.
+2026-07-16 19:26:15.562 - WARN --- [main] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[org.xyjh.xyjhstartweb.mapper, org.xyjh.xyjhstartweb.duduplan.mapper]' package. Please check your configuration.
+2026-07-16 19:26:15.693 - WARN --- [main] o.s.w.c.s.GenericWebApplicationContext   : Exception encountered during context initialization - cancelling refresh attempt: org.mockito.exceptions.base.MockitoException: 
+Mockito cannot mock this class: class org.xyjh.xyjhstartweb.Config.DataInitializer.
+
+If you're not sure why you're getting this error, please open an issue on GitHub.
+
+
+Java               : 17
+JVM vendor name    : Oracle Corporation
+JVM vendor version : 17.0.17+8-LTS-360
+JVM name           : Java HotSpot(TM) 64-Bit Server VM
+JVM version        : 17.0.17+8-LTS-360
+JVM info           : mixed mode, sharing
+OS name            : Windows 11
+OS version         : 10.0
+
+
+You are seeing this disclaimer because Mockito is configured to create inlined mocks.
+You can learn about inline mocks and their limitations under item #39 of the Mockito class javadoc.
+
+Underlying exception : org.mockito.exceptions.base.MockitoException: Could not modify all classes [class java.lang.Object, interface org.springframework.boot.CommandLineRunner, interface org.springframework.boot.Runner, class org.xyjh.xyjhstartweb.Config.DataInitializer]
+2026-07-16 19:26:15.716 - INFO --- [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-07-16 19:26:15.754 -ERROR --- [main] o.s.boot.SpringApplication               : Application run failed
+
+org.mockito.exceptions.base.MockitoException: 
+Mockito cannot mock this class: class org.xyjh.xyjhstartweb.Config.DataInitializer.
+
+If you're not sure why you're getting this error, please open an issue on GitHub.
+
+
+Java               : 17
+JVM vendor name    : Oracle Corporation
+JVM vendor version : 17.0.17+8-LTS-360
+JVM name           : Java HotSpot(TM) 64-Bit Server VM
+JVM version        : 17.0.17+8-LTS-360
+JVM info           : mixed mode, sharing
+OS name            : Windows 11
+OS version         : 10.0
+
+
+You are seeing this disclaimer because Mockito is configured to create inlined mocks.
+You can learn about inline mocks and their limitations under item #39 of the Mockito class javadoc.
+
+Underlying exception : org.mockito.exceptions.base.MockitoException: Could not modify all classes [class java.lang.Object, interface org.springframework.boot.CommandLineRunner, interface org.springframework.boot.Runner, class org.xyjh.xyjhstartweb.Config.DataInitializer]
+	at org.springframework.test.context.bean.override.mockito.MockitoBeanOverrideHandler.createMock(MockitoBeanOverrideHandler.java:130) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.mockito.MockitoBeanOverrideHandler.createOverrideInstance(MockitoBeanOverrideHandler.java:113) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideHandler.createOverrideInstance(BeanOverrideHandler.java:174) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideBeanFactoryPostProcessor.replaceOrCreateBean(BeanOverrideBeanFactoryPostProcessor.java:195) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideBeanFactoryPostProcessor.registerBeanOverride(BeanOverrideBeanFactoryPostProcessor.java:112) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideBeanFactoryPostProcessor.postProcessBeanFactory(BeanOverrideBeanFactoryPostProcessor.java:98) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:363) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:197) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.0.jar:6.2.0]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.0.jar:6.2.0]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:160) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.2.jar:3.5.2]
+Caused by: org.mockito.exceptions.base.MockitoException: Could not modify all classes [class java.lang.Object, interface org.springframework.boot.CommandLineRunner, interface org.springframework.boot.Runner, class org.xyjh.xyjhstartweb.Config.DataInitializer]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:168) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:399) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:190) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:410) ~[byte-buddy-1.15.10.jar:na]
+	... 97 common frames omitted
+Caused by: java.lang.IllegalStateException: 
+Byte Buddy could not instrument all classes within the mock's type hierarchy
+
+This problem should never occur for javac-compiled classes. This problem has been observed for classes that are:
+ - Compiled by older versions of scalac
+ - Classes that are part of the Android distribution
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetransformation(InlineBytecodeGenerator.java:285) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.mockClass(InlineBytecodeGenerator.java:218) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.TypeCachingBytecodeGenerator.lambda$mockClass$0(TypeCachingBytecodeGenerator.java:78) ~[mockito-core-5.14.2.jar:na]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:168) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:399) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:190) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:410) ~[byte-buddy-1.15.10.jar:na]
+	at org.mockito.internal.creation.bytebuddy.TypeCachingBytecodeGenerator.mockClass(TypeCachingBytecodeGenerator.java:75) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.createMockType(InlineDelegateByteBuddyMockMaker.java:408) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.doCreateMock(InlineDelegateByteBuddyMockMaker.java:367) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.createMock(InlineDelegateByteBuddyMockMaker.java:346) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker.createMock(InlineByteBuddyMockMaker.java:56) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.util.MockUtil.createMock(MockUtil.java:99) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.MockitoCore.mock(MockitoCore.java:84) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.Mockito.mock(Mockito.java:2162) ~[mockito-core-5.14.2.jar:na]
+	... 97 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: org/xyjh/xyjhstartweb/mapper/AdminUserMapper
+	at java.base/java.lang.Class.getDeclaredFields0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.privateGetDeclaredFields(Class.java:3299) ~[na:na]
+	at java.base/java.lang.Class.getDeclaredFields(Class.java:2373) ~[na:na]
+	at net.bytebuddy.description.type.TypeDescription$ForLoadedType.getDeclaredFields(TypeDescription.java:8936) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.dynamic.scaffold.InstrumentedType$Factory$Default$1.represent(InstrumentedType.java:437) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.ByteBuddy.redefine(ByteBuddy.java:923) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.ByteBuddy.redefine(ByteBuddy.java:898) ~[byte-buddy-1.15.10.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.transform(InlineBytecodeGenerator.java:390) ~[mockito-core-5.14.2.jar:na]
+	at java.instrument/java.lang.instrument.ClassFileTransformer.transform(ClassFileTransformer.java:244) ~[na:na]
+	at java.instrument/sun.instrument.TransformerManager.transform(TransformerManager.java:188) ~[na:na]
+	at java.instrument/sun.instrument.InstrumentationImpl.transform(InstrumentationImpl.java:541) ~[na:na]
+	at java.instrument/sun.instrument.InstrumentationImpl.retransformClasses0(Native Method) ~[na:na]
+	at java.instrument/sun.instrument.InstrumentationImpl.retransformClasses(InstrumentationImpl.java:169) ~[na:na]
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetransformation(InlineBytecodeGenerator.java:281) ~[mockito-core-5.14.2.jar:na]
+	... 111 common frames omitted
+Caused by: java.lang.ClassNotFoundException: org.xyjh.xyjhstartweb.mapper.AdminUserMapper
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525) ~[na:na]
+	... 125 common frames omitted
+
+2026-07-16 19:26:15.774 - WARN --- [main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] to prepare test instance [org.xyjh.xyjhstartweb.XyjhStartWebApplicationTests@3d718248]
+
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@22604c7e testClass = org.xyjh.xyjhstartweb.XyjhStartWebApplicationTests, locations = [], classes = [org.xyjh.xyjhstartweb.XyjhStartWebApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["spring.datasource.url=jdbc:h2:mem:dudu-plan-startup;MODE=MySQL;DB_CLOSE_DELAY=-1", "spring.datasource.driver-class-name=org.h2.Driver", "spring.datasource.username=sa", "spring.datasource.password=", "org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@7eb200ce, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@abbe000, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@b46e103, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@705a8dbc, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@2d760326, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@3ba348ca, org.springframework.test.context.bean.override.BeanOverrideContextCustomizer@22371ff3, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@7cd2ccf8], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:160) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.3.jar:5.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.3.jar:1.11.3]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.2.jar:3.5.2]
+Caused by: org.mockito.exceptions.base.MockitoException: 
+Mockito cannot mock this class: class org.xyjh.xyjhstartweb.Config.DataInitializer.
+
+If you're not sure why you're getting this error, please open an issue on GitHub.
+
+
+Java               : 17
+JVM vendor name    : Oracle Corporation
+JVM vendor version : 17.0.17+8-LTS-360
+JVM name           : Java HotSpot(TM) 64-Bit Server VM
+JVM version        : 17.0.17+8-LTS-360
+JVM info           : mixed mode, sharing
+OS name            : Windows 11
+OS version         : 10.0
+
+
+You are seeing this disclaimer because Mockito is configured to create inlined mocks.
+You can learn about inline mocks and their limitations under item #39 of the Mockito class javadoc.
+
+Underlying exception : org.mockito.exceptions.base.MockitoException: Could not modify all classes [class java.lang.Object, interface org.springframework.boot.CommandLineRunner, interface org.springframework.boot.Runner, class org.xyjh.xyjhstartweb.Config.DataInitializer]
+	at org.springframework.test.context.bean.override.mockito.MockitoBeanOverrideHandler.createMock(MockitoBeanOverrideHandler.java:130) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.mockito.MockitoBeanOverrideHandler.createOverrideInstance(MockitoBeanOverrideHandler.java:113) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideHandler.createOverrideInstance(BeanOverrideHandler.java:174) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideBeanFactoryPostProcessor.replaceOrCreateBean(BeanOverrideBeanFactoryPostProcessor.java:195) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideBeanFactoryPostProcessor.registerBeanOverride(BeanOverrideBeanFactoryPostProcessor.java:112) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.bean.override.BeanOverrideBeanFactoryPostProcessor.postProcessBeanFactory(BeanOverrideBeanFactoryPostProcessor.java:98) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:363) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:197) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609) ~[spring-context-6.2.0.jar:6.2.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.0.jar:6.2.0]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.0.jar:6.2.0]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461) ~[spring-boot-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108) ~[spring-boot-test-3.4.0.jar:3.4.0]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.0.jar:6.2.0]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.0.jar:6.2.0]
+	... 75 common frames omitted
+Caused by: org.mockito.exceptions.base.MockitoException: Could not modify all classes [class java.lang.Object, interface org.springframework.boot.CommandLineRunner, interface org.springframework.boot.Runner, class org.xyjh.xyjhstartweb.Config.DataInitializer]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:168) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:399) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:190) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:410) ~[byte-buddy-1.15.10.jar:na]
+	... 97 common frames omitted
+Caused by: java.lang.IllegalStateException: 
+Byte Buddy could not instrument all classes within the mock's type hierarchy
+
+This problem should never occur for javac-compiled classes. This problem has been observed for classes that are:
+ - Compiled by older versions of scalac
+ - Classes that are part of the Android distribution
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetransformation(InlineBytecodeGenerator.java:285) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.mockClass(InlineBytecodeGenerator.java:218) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.TypeCachingBytecodeGenerator.lambda$mockClass$0(TypeCachingBytecodeGenerator.java:78) ~[mockito-core-5.14.2.jar:na]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:168) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:399) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache.findOrInsert(TypeCache.java:190) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.TypeCache$WithInlineExpunction.findOrInsert(TypeCache.java:410) ~[byte-buddy-1.15.10.jar:na]
+	at org.mockito.internal.creation.bytebuddy.TypeCachingBytecodeGenerator.mockClass(TypeCachingBytecodeGenerator.java:75) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.createMockType(InlineDelegateByteBuddyMockMaker.java:408) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.doCreateMock(InlineDelegateByteBuddyMockMaker.java:367) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.createMock(InlineDelegateByteBuddyMockMaker.java:346) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker.createMock(InlineByteBuddyMockMaker.java:56) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.util.MockUtil.createMock(MockUtil.java:99) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.internal.MockitoCore.mock(MockitoCore.java:84) ~[mockito-core-5.14.2.jar:na]
+	at org.mockito.Mockito.mock(Mockito.java:2162) ~[mockito-core-5.14.2.jar:na]
+	... 97 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: org/xyjh/xyjhstartweb/mapper/AdminUserMapper
+	at java.base/java.lang.Class.getDeclaredFields0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.privateGetDeclaredFields(Class.java:3299) ~[na:na]
+	at java.base/java.lang.Class.getDeclaredFields(Class.java:2373) ~[na:na]
+	at net.bytebuddy.description.type.TypeDescription$ForLoadedType.getDeclaredFields(TypeDescription.java:8936) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.dynamic.scaffold.InstrumentedType$Factory$Default$1.represent(InstrumentedType.java:437) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.ByteBuddy.redefine(ByteBuddy.java:923) ~[byte-buddy-1.15.10.jar:na]
+	at net.bytebuddy.ByteBuddy.redefine(ByteBuddy.java:898) ~[byte-buddy-1.15.10.jar:na]
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.transform(InlineBytecodeGenerator.java:390) ~[mockito-core-5.14.2.jar:na]
+	at java.instrument/java.lang.instrument.ClassFileTransformer.transform(ClassFileTransformer.java:244) ~[na:na]
+	at java.instrument/sun.instrument.TransformerManager.transform(TransformerManager.java:188) ~[na:na]
+	at java.instrument/sun.instrument.InstrumentationImpl.transform(InstrumentationImpl.java:541) ~[na:na]
+	at java.instrument/sun.instrument.InstrumentationImpl.retransformClasses0(Native Method) ~[na:na]
+	at java.instrument/sun.instrument.InstrumentationImpl.retransformClasses(InstrumentationImpl.java:169) ~[na:na]
+	at org.mockito.internal.creation.bytebuddy.InlineBytecodeGenerator.triggerRetransformation(InlineBytecodeGenerator.java:281) ~[mockito-core-5.14.2.jar:na]
+	... 111 common frames omitted
+Caused by: java.lang.ClassNotFoundException: org.xyjh.xyjhstartweb.mapper.AdminUserMapper
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525) ~[na:na]
+	... 125 common frames omitted
+
+2026-07-16 19:26:30.983 - WARN --- [main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/D:/maven_repository/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+	jar:file:/D:/maven_repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-07-16 19:26:30.997 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Starting XyjhStartWebApplicationTests using Java 17.0.17 with PID 5928 (started by Administrator in D:\XYJHStart-Web)
+2026-07-16 19:26:30.998 -DEBUG --- [main] o.x.x.XyjhStartWebApplicationTests       : Running with Spring Boot v3.4.0, Spring v6.2.0
+2026-07-16 19:26:30.998 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : No active profile set, falling back to 1 default profile: "default"
+2026-07-16 19:26:31.397 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2026-07-16 19:26:31.414 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 0 JDBC repository interfaces.
+2026-07-16 19:26:31.469 - INFO --- [main] .i.s.PathMatchingResourcePatternResolver : Skipping search for files matching pattern [**/*.class]: directory [D:\XYJHStart-Web\target\test-classes\org\xyjh\xyjhstartweb\mapper] does not exist
+2026-07-16 19:26:31.470 - INFO --- [main] .i.s.PathMatchingResourcePatternResolver : Skipping search for files matching pattern [**/*.class]: directory [D:\XYJHStart-Web\target\test-classes\org\xyjh\xyjhstartweb\duduplan\mapper] does not exist
+2026-07-16 19:26:32.119 - WARN --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: f5d3664e-607d-4244-a033-1f663975b5ff
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-06-16 19:01:40.804 - INFO --- [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-06-16 19:01:40.967 - INFO --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP - Starting...
-2026-06-16 19:01:45.928 - INFO --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariCP - Added connection com.mysql.cj.jdbc.ConnectionImpl@24c8029b
-2026-06-16 19:01:45.929 - INFO --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP - Start completed.
-2026-06-16 19:01:45.993 - INFO --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2026-06-16 19:01:46.010 - INFO --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 9191 (http) with context path '/'
-2026-06-16 19:01:46.016 - INFO --- [restartedMain] o.x.x.XyjhStartWebApplication            : Started XyjhStartWebApplication in 6.251 seconds (process running for 6.43)
-2026-06-16 19:01:46.023 -DEBUG --- [restartedMain] o.x.x.m.AdminUserMapper.findByUsername   : ==>  Preparing: SELECT * FROM admin_user WHERE username = ?
+2026-07-16 19:26:32.130 - INFO --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-07-16 19:26:32.632 - INFO --- [main] com.zaxxer.hikari.HikariDataSource       : HikariCP - Starting...
+2026-07-16 19:26:32.768 - INFO --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariCP - Added connection conn0: url=jdbc:h2:mem:dudu-plan-startup user=SA
+2026-07-16 19:26:32.770 - INFO --- [main] com.zaxxer.hikari.HikariDataSource       : HikariCP - Start completed.
+2026-07-16 19:26:32.924 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Started XyjhStartWebApplicationTests in 2.124 seconds (process running for 4.218)
+2026-07-16 19:26:32.982 - INFO --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariCP - Shutdown initiated...
+2026-07-16 19:26:32.984 - INFO --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariCP - Shutdown completed.
+2026-07-16 19:27:04.352 - WARN --- [main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/Administrator/.m2/repository/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/Administrator/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-07-16 19:27:04.366 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Starting XyjhStartWebApplicationTests using Java 17.0.17 with PID 32668 (started by Administrator in D:\XYJHStart-Web)
+2026-07-16 19:27:04.367 -DEBUG --- [main] o.x.x.XyjhStartWebApplicationTests       : Running with Spring Boot v3.4.0, Spring v6.2.0
+2026-07-16 19:27:04.367 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : No active profile set, falling back to 1 default profile: "default"
+2026-07-16 19:27:04.791 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2026-07-16 19:27:04.810 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 JDBC repository interfaces.
+2026-07-16 19:27:04.872 - INFO --- [main] .i.s.PathMatchingResourcePatternResolver : Skipping search for files matching pattern [**/*.class]: directory [D:\XYJHStart-Web\target\test-classes\org\xyjh\xyjhstartweb\mapper] does not exist
+2026-07-16 19:27:04.874 - INFO --- [main] .i.s.PathMatchingResourcePatternResolver : Skipping search for files matching pattern [**/*.class]: directory [D:\XYJHStart-Web\target\test-classes\org\xyjh\xyjhstartweb\duduplan\mapper] does not exist
+2026-07-16 19:27:05.234 - INFO --- [main] com.zaxxer.hikari.HikariDataSource       : HikariCP - Starting...
+2026-07-16 19:27:05.353 - INFO --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariCP - Added connection conn0: url=jdbc:h2:mem:dudu-plan-startup user=SA
+2026-07-16 19:27:05.355 - INFO --- [main] com.zaxxer.hikari.HikariDataSource       : HikariCP - Start completed.
+2026-07-16 19:27:05.648 - WARN --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: b2fd07aa-9e0e-4bc0-a249-7422e7215414
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-07-16 19:27:05.656 - INFO --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-07-16 19:27:06.261 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Started XyjhStartWebApplicationTests in 2.113 seconds (process running for 2.741)
+2026-07-16 19:27:06.277 -DEBUG --- [main] o.x.x.m.AdminUserMapper.findByUsername   : ==>  Preparing: SELECT * FROM admin_user WHERE username = ?
+2026-07-16 19:27:06.294 -DEBUG --- [main] o.x.x.m.AdminUserMapper.findByUsername   : ==> Parameters: admin(String)
+2026-07-16 19:27:06.312 -DEBUG --- [main] o.x.x.m.AdminUserMapper.findByUsername   : <==      Total: 0
+2026-07-16 19:27:06.360 -DEBUG --- [main] o.x.x.mapper.AdminUserMapper.insert      : ==>  Preparing: INSERT INTO admin_user(username, password, role) VALUES(?, ?, ?)
+2026-07-16 19:27:06.361 -DEBUG --- [main] o.x.x.mapper.AdminUserMapper.insert      : ==> Parameters: admin(String), $2a$10$HSBIag0MnhXIR7so8s8/FOBiwvJqFA7cLINhL5cqliyQ9b1Miqpmy(String), ADMIN(String)
+2026-07-16 19:27:06.363 -DEBUG --- [main] o.x.x.mapper.AdminUserMapper.insert      : <==    Updates: 1
+2026-07-16 19:27:07.418 - INFO --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariCP - Shutdown initiated...
+2026-07-16 19:27:07.420 - INFO --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariCP - Shutdown completed.
+2026-07-16 19:27:44.511 - WARN --- [main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/D:/maven_repository/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+	jar:file:/D:/maven_repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-07-16 19:27:44.521 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Starting XyjhStartWebApplicationTests using Java 17.0.17 with PID 33776 (started by Administrator in D:\XYJHStart-Web)
+2026-07-16 19:27:44.522 -DEBUG --- [main] o.x.x.XyjhStartWebApplicationTests       : Running with Spring Boot v3.4.0, Spring v6.2.0
+2026-07-16 19:27:44.525 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : No active profile set, falling back to 1 default profile: "default"
+2026-07-16 19:27:44.890 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2026-07-16 19:27:44.906 - INFO --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 JDBC repository interfaces.
+2026-07-16 19:27:44.962 - INFO --- [main] .i.s.PathMatchingResourcePatternResolver : Skipping search for files matching pattern [**/*.class]: directory [D:\XYJHStart-Web\target\test-classes\org\xyjh\xyjhstartweb\mapper] does not exist
+2026-07-16 19:27:44.963 - INFO --- [main] .i.s.PathMatchingResourcePatternResolver : Skipping search for files matching pattern [**/*.class]: directory [D:\XYJHStart-Web\target\test-classes\org\xyjh\xyjhstartweb\duduplan\mapper] does not exist
+2026-07-16 19:27:45.265 - INFO --- [main] com.zaxxer.hikari.HikariDataSource       : HikariCP - Starting...
+2026-07-16 19:27:45.367 - INFO --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariCP - Added connection conn0: url=jdbc:h2:mem:dudu-plan-startup user=SA
+2026-07-16 19:27:45.368 - INFO --- [main] com.zaxxer.hikari.HikariDataSource       : HikariCP - Start completed.
+2026-07-16 19:27:45.560 - WARN --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: d2788954-a3d8-4584-98ae-568bf67907ba
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-07-16 19:27:45.566 - INFO --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-07-16 19:27:46.106 - INFO --- [main] o.x.x.XyjhStartWebApplicationTests       : Started XyjhStartWebApplicationTests in 1.787 seconds (process running for 3.872)
+2026-07-16 19:27:46.124 -DEBUG --- [main] o.x.x.m.AdminUserMapper.findByUsername   : ==>  Preparing: SELECT * FROM admin_user WHERE username = ?
+2026-07-16 19:27:46.146 -DEBUG --- [main] o.x.x.m.AdminUserMapper.findByUsername   : ==> Parameters: admin(String)
+2026-07-16 19:27:46.161 -DEBUG --- [main] o.x.x.m.AdminUserMapper.findByUsername   : <==      Total: 0
+2026-07-16 19:27:46.209 -DEBUG --- [main] o.x.x.mapper.AdminUserMapper.insert      : ==>  Preparing: INSERT INTO admin_user(username, password, role) VALUES(?, ?, ?)
+2026-07-16 19:27:46.211 -DEBUG --- [main] o.x.x.mapper.AdminUserMapper.insert      : ==> Parameters: admin(String), $2a$10$20UeiNYpUQbc1/zTStVnSOFC2hgeeycRS9lXg8AHINC6KKfwB0cQ2(String), ADMIN(String)
+2026-07-16 19:27:46.212 -DEBUG --- [main] o.x.x.mapper.AdminUserMapper.insert      : <==    Updates: 1
+2026-07-16 19:27:46.242 - INFO --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariCP - Shutdown initiated...
+2026-07-16 19:27:46.244 - INFO --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariCP - Shutdown completed.

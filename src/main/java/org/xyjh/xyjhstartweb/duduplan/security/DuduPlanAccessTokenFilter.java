@@ -39,17 +39,19 @@ public class DuduPlanAccessTokenFilter extends OncePerRequestFilter {
             writeUnauthorized(response);
             return;
         }
+        DuduPlanTokenService.TokenClaims claims;
         try {
-            DuduPlanTokenService.TokenClaims claims = tokenService.parseAccessToken(authorization.substring(7));
-            DuduPlanPrincipal principal = new DuduPlanPrincipal(claims.role(), claims.expiresAt());
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(principal, null, List.of())
-            );
-            filterChain.doFilter(request, response);
+            claims = tokenService.parseAccessToken(authorization.substring(7));
         } catch (Exception exception) {
             SecurityContextHolder.clearContext();
             writeUnauthorized(response);
+            return;
         }
+        DuduPlanPrincipal principal = new DuduPlanPrincipal(claims.role(), claims.expiresAt());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, List.of())
+        );
+        filterChain.doFilter(request, response);
     }
 
     private void writeUnauthorized(HttpServletResponse response) throws IOException {

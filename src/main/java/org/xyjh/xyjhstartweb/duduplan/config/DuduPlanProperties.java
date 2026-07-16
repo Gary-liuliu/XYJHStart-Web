@@ -6,24 +6,24 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "dudu-plan")
 public class DuduPlanProperties {
-    private String ownerPasswordHash = "";
-    private String observerPasswordHash = "";
+    private String ownerPassword = "";
+    private String observerPassword = "";
     private String tokenSecret = "";
 
-    public String getOwnerPasswordHash() {
-        return ownerPasswordHash;
+    public String getOwnerPassword() {
+        return ownerPassword;
     }
 
-    public void setOwnerPasswordHash(String ownerPasswordHash) {
-        this.ownerPasswordHash = ownerPasswordHash;
+    public void setOwnerPassword(String ownerPassword) {
+        this.ownerPassword = ownerPassword;
     }
 
-    public String getObserverPasswordHash() {
-        return observerPasswordHash;
+    public String getObserverPassword() {
+        return observerPassword;
     }
 
-    public void setObserverPasswordHash(String observerPasswordHash) {
-        this.observerPasswordHash = observerPasswordHash;
+    public void setObserverPassword(String observerPassword) {
+        this.observerPassword = observerPassword;
     }
 
     public String getTokenSecret() {

@@ -19,15 +19,10 @@ public class DuduPlanTokenService {
     public static final Duration REFRESH_TOKEN_LIFETIME = Duration.ofDays(365);
 
     private final DuduPlanProperties properties;
-    private final Clock clock;
+    private final Clock clock = Clock.systemUTC();
 
     public DuduPlanTokenService(DuduPlanProperties properties) {
-        this(properties, Clock.systemUTC());
-    }
-
-    DuduPlanTokenService(DuduPlanProperties properties, Clock clock) {
         this.properties = properties;
-        this.clock = clock;
     }
 
     public IssuedTokens issueTokens(DuduPlanRole role) {
@@ -76,7 +71,7 @@ public class DuduPlanTokenService {
     private SecretKey signingKey() {
         String tokenSecret = properties.getTokenSecret();
         if (tokenSecret == null || tokenSecret.getBytes(StandardCharsets.UTF_8).length < 32) {
-            throw new IllegalStateException("DUDU_PLAN_TOKEN_SECRET must contain at least 32 UTF-8 bytes");
+            throw new IllegalStateException("dudu-plan.token-secret must contain at least 32 UTF-8 bytes");
         }
         return Keys.hmacShaKeyFor(tokenSecret.getBytes(StandardCharsets.UTF_8));
     }

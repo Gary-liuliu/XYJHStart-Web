@@ -66,6 +66,28 @@ public class DuduPlanSessionRegistry implements DuduPlanRealtimeGateway {
         }
     }
 
+    public void sendToSession(WebSocketSession session, Map<String, Object> event) {
+        RegisteredSession registered = null;
+        synchronized (sessions) {
+            for (RegisteredSession candidate : sessions.values()) {
+                if (candidate.rawSession().getId().equals(session.getId())) {
+                    registered = candidate;
+                    break;
+                }
+            }
+        }
+        try {
+            String payload = objectMapper.writeValueAsString(event);
+            if (registered != null) {
+                registered.concurrentSession().sendMessage(new TextMessage(payload));
+            } else if (session.isOpen()) {
+                session.sendMessage(new TextMessage(payload));
+            }
+        } catch (IOException exception) {
+            closeQuietly(session, CloseStatus.SERVER_ERROR);
+        }
+    }
+
     @Override
     public boolean isOnline(DuduPlanRole role) {
         synchronized (sessions) {

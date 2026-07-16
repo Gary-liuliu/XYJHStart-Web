@@ -16,6 +16,7 @@ import org.xyjh.xyjhstartweb.duduplan.security.DuduPlanPrincipal;
 import org.xyjh.xyjhstartweb.duduplan.service.DuduPlanChatService;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -31,10 +32,14 @@ public class DuduPlanChatController {
     public Map<String, Object> messages(@AuthenticationPrincipal DuduPlanPrincipal principal,
                                         @RequestParam(required = false) Long beforeId,
                                         @RequestParam(defaultValue = "50") int limit) {
-        List<ChatMessageResponse> items = chatService.history(principal.role(), beforeId, limit);
-        Long nextCursor = items.size() == Math.min(Math.max(limit, 1), 50)
+        int safeLimit = limit <= 0 ? 50 : Math.min(limit, 50);
+        List<ChatMessageResponse> items = chatService.history(principal.role(), beforeId, safeLimit);
+        Long nextCursor = items.size() == safeLimit
                 ? items.get(items.size() - 1).id() : null;
-        return Map.of("items", items, "nextCursor", nextCursor == null ? "" : nextCursor);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("items", items);
+        response.put("nextCursor", nextCursor);
+        return response;
     }
 
     @GetMapping("/unread-count")

@@ -4,6 +4,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.xyjh.xyjhstartweb.duduplan.dto.ChatMessageRequest;
 import org.xyjh.xyjhstartweb.duduplan.dto.ChatMessageResponse;
 import org.xyjh.xyjhstartweb.duduplan.entity.DuduChatMessage;
@@ -87,15 +89,17 @@ public class DuduPlanChatService {
     public List<ChatMessageResponse> markDelivered(DuduPlanRole receiverRole, List<String> messageIds) {
         List<String> uniqueIds = validateMessageIds(messageIds);
         List<DuduChatMessage> messages = messageMapper.findByMessageIds(uniqueIds);
-        if (messages.size() != uniqueIds.size() || messages.stream()
-                .anyMatch(message -> !receiverRole.value().equals(message.getReceiverRole()))) {
+        if (messages.size() != uniqueIds.size()) {
+            throw new DuduPlanApiException(HttpStatus.NOT_FOUND, "message_not_found");
+        }
+        if (messages.stream().anyMatch(message -> !receiverRole.value().equals(message.getReceiverRole()))) {
             throw new DuduPlanApiException(HttpStatus.FORBIDDEN, "not_message_receiver");
         }
         long deliveredAt = System.currentTimeMillis();
         messageMapper.markDelivered(receiverRole.value(), uniqueIds, deliveredAt);
         List<ChatMessageResponse> updated = messageMapper.findByMessageIds(uniqueIds).stream()
                 .map(ChatMessageResponse::from).toList();
-        realtimeGateway.sendToRole(receiverRole.peer(), Map.of(
+        sendAfterCommit(receiverRole.peer(), Map.of(
                 "protocolVersion", 2, "type", "chat_delivered", "messageIds", uniqueIds,
                 "deliveredAt", deliveredAt
         ));
@@ -117,7 +121,7 @@ public class DuduPlanChatService {
                 "protocolVersion", 2, "type", "chat_read", "upToMessageId", upToMessageId,
                 "readAt", readAt, "updatedCount", updatedCount
         );
-        realtimeGateway.sendToRole(receiverRole.peer(), event);
+        sendAfterCommit(receiverRole.peer(), event);
         return event;
     }
 
@@ -139,7 +143,7 @@ public class DuduPlanChatService {
             }
             message = messageMapper.findByMessageId(messageId);
             ChatMessageResponse response = ChatMessageResponse.from(message);
-            realtimeGateway.sendToRole(senderRole.peer(), Map.of(
+            sendAfterCommit(senderRole.peer(), Map.of(
                     "protocolVersion", 2, "type", "chat_recalled", "message", response
             ));
             return response;
@@ -203,6 +207,19 @@ public class DuduPlanChatService {
             throw new DuduPlanApiException(HttpStatus.BAD_REQUEST, "invalid_message_ids");
         }
         return List.copyOf(uniqueIds);
+    }
+
+    private void sendAfterCommit(DuduPlanRole role, Map<String, Object> event) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            realtimeGateway.sendToRole(role, event);
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                realtimeGateway.sendToRole(role, event);
+            }
+        });
     }
 
     private record ValidatedMessage(String messageId, String messageType, String content,
