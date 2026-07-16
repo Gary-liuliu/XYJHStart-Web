@@ -1,9 +1,11 @@
 package org.xyjh.xyjhstartweb.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.xyjh.xyjhstartweb.dto.CreateAccountXYJHRequest;
 import org.xyjh.xyjhstartweb.dto.QueryAccountXYJHRequest;
+import org.xyjh.xyjhstartweb.dto.SyncAccountXYJHRequest;
 import org.xyjh.xyjhstartweb.dto.UpdateAccountXYJHRequest;
 import org.xyjh.xyjhstartweb.entity.AccountXYJH;
 import org.xyjh.xyjhstartweb.service.AccountXYJHService;
@@ -16,12 +18,28 @@ public class AccountXYJHController {
     @Autowired
     private AccountXYJHService accountXYJHService;
 
+    @Value("${xyjh.sync.secret:}")
+    private String syncSecret;
+
     /**
      * 创建新账号
      */
     @PostMapping("/create")
     public Result<AccountXYJH> createAccount(@RequestBody CreateAccountXYJHRequest request) {
         return accountXYJHService.createAccount(request);
+    }
+
+    @PostMapping("/sync/refresh")
+    public Result<AccountXYJH> syncRefreshResult(
+            @RequestHeader(value = "X-XYJH-Sync-Token", required = false) String syncToken,
+            @RequestBody SyncAccountXYJHRequest request) {
+        if (syncSecret == null || syncSecret.isBlank()) {
+            return Result.fail(403, "同步密钥未配置");
+        }
+        if (!syncSecret.equals(syncToken)) {
+            return Result.fail(403, "同步密钥无效");
+        }
+        return accountXYJHService.syncRefreshResult(request);
     }
 
     /**
@@ -54,6 +72,11 @@ public class AccountXYJHController {
     @PostMapping("/list")
     public Result<?> getAccountsByPage(@RequestBody QueryAccountXYJHRequest request) {
         return accountXYJHService.getAccountsByPage(request);
+    }
+
+    @GetMapping("/accounting-summary")
+    public Result<?> getAccountingSummary() {
+        return accountXYJHService.getAccountingSummary();
     }
 
     /**

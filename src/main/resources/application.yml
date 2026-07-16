@@ -32,6 +32,15 @@ file:
     path: D:/XYJHStart-Web/uploads
   access:
     url: http://localhost:9191/files
+
+xyjh:
+  sync:
+    secret: ${XYJH_SYNC_SECRET:EgoKaKa}
+
+dudu-plan:
+  owner-password-hash: ${DUDU_PLAN_OWNER_PASSWORD_HASH:}
+  observer-password-hash: ${DUDU_PLAN_OBSERVER_PASSWORD_HASH:}
+  token-secret: ${DUDU_PLAN_TOKEN_SECRET:}
 # --- MyBatis 配置 ---
 mybatis:
   mapper-locations: classpath:mapper/*.xml

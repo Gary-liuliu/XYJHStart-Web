@@ -1,262 +1,182 @@
 <template>
   <el-container class="layout-container">
-    <el-aside v-if="!isMobile" :width="isCollapsed ? '64px' : '200px'" class="layout-aside">
-      <el-menu
-        :default-active="$route.path"
-        class="layout-menu"
-        :collapse="isCollapsed"
-        :collapse-transition="false"
-        router
-        background-color="#304156"
-        text-color="#bfcbd9"
-        active-text-color="#409EFF"
-      >
-        <div class="logo-area">
-          <span v-if="!isCollapsed">XYJH 管理后台</span>
-        </div>
-        
-        <el-menu-item index="/">
-          <el-icon><User /></el-icon>
-          <span>账号买卖</span>
-        </el-menu-item>
-        
-        <el-menu-item index="/pending-licenses">
-          <el-icon><Clock /></el-icon>
-          <span>待审核模块</span>
-        </el-menu-item>
-        
-        <el-menu-item index="/manage-licenses">
-          <el-icon><Files /></el-icon>
-          <span>许可证维护</span>
-        </el-menu-item>
-        <!-- 新增：管理员维护 -->
-        <el-menu-item index="/manage-admins">
-          <el-icon><UserFilled /></el-icon>
-          <span>管理员维护</span>
-        </el-menu-item>
-           <!-- 新增：许可证续期 -->
-        <el-menu-item index="/renew-licenses">
-          <el-icon><RefreshRight /></el-icon>
-          <span>许可证续期</span>
+    <el-aside v-if="!isMobile" width="220px" class="layout-aside">
+      <el-menu :default-active="$route.path" class="layout-menu" router>
+        <div class="logo-area">XYJH 管理后台</div>
+        <el-menu-item v-for="item in menuItems" :key="item.index" :index="item.index">
+          <el-icon><component :is="item.icon" /></el-icon>
+          <span>{{ item.label }}</span>
         </el-menu-item>
       </el-menu>
-      
+      <button class="logout-button" type="button" @click="handleLogout">退出登录</button>
     </el-aside>
 
-    <el-drawer
-      v-model="drawerVisible"
-      direction="ltr"
-      :with-header="false"
-      size="200px"
-      custom-class="mobile-drawer"
-    >
-      <el-menu
-        :default-active="$route.path"
-        class="layout-menu"
-        router
-        background-color="#304156"
-        text-color="#bfcbd9"
-        active-text-color="#409EFF"
-      >
-        <div class="logo-area">
-          <span>XYJH 管理后台</span>
-        </div>
-        
-        <el-menu-item index="/" @click="drawerVisible = false">
-          <el-icon><User /></el-icon>
-          <span>账号买卖</span>
-        </el-menu-item>
-        
-        <el-menu-item index="/pending-licenses" @click="drawerVisible = false">
-          <el-icon><Clock /></el-icon>
-          <span>待审核模块</span>
-        </el-menu-item>
-        
-        <el-menu-item index="/manage-licenses" @click="drawerVisible = false">
-          <el-icon><Files /></el-icon>
-          <span>许可证维护</span>
-        </el-menu-item>
-          <!-- 新增：管理员维护（移动抽屉） -->
-        <el-menu-item index="/manage-admins" @click="drawerVisible = false">
-          <el-icon><UserFilled /></el-icon>
-          <span>管理员维护</span>
-        </el-menu-item>
-         <!-- 新增：许可证续期（移动抽屉） -->
-        <el-menu-item index="/renew-licenses" @click="drawerVisible = false">
-          <el-icon><RefreshRight /></el-icon>
-          <span>许可证续期</span>
+    <el-drawer v-model="drawerVisible" direction="ltr" :with-header="false" size="220px" custom-class="mobile-drawer">
+      <el-menu :default-active="$route.path" class="layout-menu" router>
+        <div class="logo-area">XYJH 管理后台</div>
+        <el-menu-item v-for="item in menuItems" :key="item.index" :index="item.index" @click="drawerVisible = false">
+          <el-icon><component :is="item.icon" /></el-icon>
+          <span>{{ item.label }}</span>
         </el-menu-item>
       </el-menu>
     </el-drawer>
 
-    <el-container>
-     <el-header class="layout-header">
-        <div class="header-left">
-          
-          <div v-if="isMobile" @click="drawerVisible = true" class="hamburger-button">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-          </div>
-
-          <el-icon v-else @click="isCollapsed = !isCollapsed" class="collapse-icon">
-            <Expand v-if="isCollapsed" />
-            <Fold v-else />
-          </el-icon>
-        </div>
-        
-        <div class="header-right">
-          <el-dropdown>
-            <span class="user-avatar">
-              <span>admin</span>
-              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
+    <el-container class="content-container">
+      <el-header v-if="isMobile" class="mobile-header">
+        <button class="icon-button" type="button" aria-label="打开菜单" @click="drawerVisible = true">
+          <el-icon><Expand /></el-icon>
+        </button>
+        <span>XYJH</span>
+        <button class="mobile-logout" type="button" @click="handleLogout">退出</button>
       </el-header>
 
       <el-main class="layout-main">
         <router-view />
       </el-main>
-      
     </el-container>
   </el-container>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../store/auth';
-import { useBreakpoints, breakpointsTailwind } from '@vueuse/core';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
+import { Clock, Expand, Files, RefreshRight, User, UserFilled } from '@element-plus/icons-vue'
+import { useAuthStore } from '../store/auth'
 
-// 【已修复】: 明确导入 Header 中需要用到的所有图标
-// 即使 main.js 注册了，这里也导入一次，确保万无一失
-import { 
- 
-  Expand, 
-  Fold, 
-  ArrowDown, 
-  HomeFilled, 
-  Clock, 
-  Files,
-  UserFilled,
-  RefreshRight,
-  User
-} from '@element-plus/icons-vue';
+const authStore = useAuthStore()
+const router = useRouter()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const isMobile = breakpoints.smaller('md')
+const drawerVisible = ref(false)
 
-const authStore = useAuthStore();
-
-// PC端侧边栏折叠状态
-const isCollapsed = ref(false); 
-// 移动端抽屉可见状态
-const drawerVisible = ref(false);
-
-// 使用 VueUse 来创建响应式断点
-const breakpoints = useBreakpoints(breakpointsTailwind);
-// 创建一个计算属性，当屏幕宽度小于 md (768px) 断点时，isMobile 为 true
-const isMobile = breakpoints.smaller('md');
-
-const router = useRouter();
+const menuItems = [
+  { index: '/', label: '账号买卖', icon: User },
+  { index: '/pending-licenses', label: '待审核模块', icon: Clock },
+  { index: '/manage-licenses', label: '许可证维护', icon: Files },
+  { index: '/manage-admins', label: '管理员维护', icon: UserFilled },
+  { index: '/renew-licenses', label: '许可证续期', icon: RefreshRight }
+]
 
 const handleLogout = () => {
-  authStore.logout(router);
-};
+  authStore.logout(router)
+}
 </script>
 
-
-
 <style scoped>
-/* 【组件局部样式】
-  带 "scoped" 属性。
-  这里放你所有的 .layout-container, .hamburger-button 等样式。
-*/
-
-/* 确保布局撑满全屏 */
 .layout-container {
+  width: 100%;
   height: 100vh;
-  width: 100%;        /* 修复：避免 100vw 导致水平溢出产生右侧白边 */
-  overflow-x: hidden; /* 保险：关闭水平滚动 */
+  overflow: hidden;
+  background: #edf2f8;
 }
 
 .layout-aside {
-  background-color: #304156;
-  transition: width 0.28s;
-  overflow-x: hidden; /* 防止折叠时内容溢出 */
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: #111827;
+  border-right: 1px solid #1f2937;
 }
 
-/* 修复 el-menu 边框问题 */
 .layout-menu {
   height: 100%;
-  border-right: none;
+  border-right: 0;
+  background: transparent;
 }
 
 .logo-area {
-  height: 60px;
   display: flex;
+  align-items: center;
+  height: 66px;
+  padding: 0 20px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.logout-button {
+  height: 42px;
+  margin: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
+.content-container {
+  min-width: 0;
+}
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 10px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mobile-header span {
+  color: #111827;
+  font-weight: 800;
+}
+
+.icon-button,
+.mobile-logout {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 18px;
-  font-weight: 600;
-  white-space: nowrap; /* 防止文字换行 */
-}
-
-.layout-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  height: 34px;
+  border: 1px solid #d8e1ec;
+  border-radius: 8px;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
-  padding: 0 20px;
-}
-
-.collapse-icon {
-  font-size: 24px;
+  color: #334155;
   cursor: pointer;
-  display: flex; 
-  align-items: center;
 }
 
-/* 【新增】: 自定义CSS汉堡按钮样式 */
-.hamburger-button {
-  width: 24px; /* 匹配 .collapse-icon 的字体大小 */
-  height: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around; /* 均匀分布三条杠 */
-  cursor: pointer;
-  padding: 3px 0; /* 垂直内边距，让杠更聚拢 */
-  box-sizing: border-box; /* 确保 padding 不会撑大 24px 的高度 */
+.icon-button {
+  width: 36px;
 }
 
-.hamburger-button .bar {
-  width: 100%;
-  height: 3px; /* 杠的粗细 */
-  background-color: #5a5e66; /* 按钮颜色 (Element Plus 的 header 字体颜色) */
-  border-radius: 1px;
-}
-
-/* 【新增】: 确保 .header-left 容器垂直居中 */
-.header-left {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.user-avatar {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+.mobile-logout {
+  padding: 0 10px;
 }
 
 .layout-main {
-  background-color: #f0f2f5;
-  padding: 20px;
-  overflow-y: auto;
+  min-width: 0;
+  overflow: auto;
+  padding: 16px;
+  background: transparent;
+}
+
+:deep(.layout-menu .el-menu-item) {
+  height: 44px;
+  margin: 6px 10px;
+  border-radius: 8px;
+  color: #cbd5e1;
+}
+
+:deep(.layout-menu .el-menu-item.is-active) {
+  background: #2563eb;
+  color: #fff;
+}
+
+:deep(.layout-menu .el-menu-item:hover) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .layout-container {
+    overflow: hidden;
+  }
+
+  .layout-main {
+    overflow: hidden;
+    padding: 0;
+  }
 }
 </style>

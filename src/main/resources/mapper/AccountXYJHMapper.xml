@@ -49,19 +49,15 @@
         SELECT * FROM account_xyjh
         <where>
             <if test="account != null and account != ''">
-                AND account LIKE CONCAT('%', #{account}, '%')
-            </if>
-            <if test="accountName != null and accountName != ''">
-                AND account_name LIKE CONCAT('%', #{accountName}, '%')
+                AND (
+                    account LIKE CONCAT('%', #{account}, '%')
+                    OR account_name LIKE CONCAT('%', #{account}, '%')
+                    OR remark LIKE CONCAT('%', #{account}, '%')
+                    OR strong_character LIKE CONCAT('%', #{account}, '%')
+                )
             </if>
             <if test="status != null">
                 AND status = #{status}
-            </if>
-            <if test="remark != null and remark != ''">
-                AND remark LIKE CONCAT('%', #{remark}, '%')
-            </if>
-            <if test="strongCharacter != null and strongCharacter != ''">
-                AND strong_character LIKE CONCAT('%', #{strongCharacter}, '%')
             </if>
         </where>
         ORDER BY buy_time DESC
@@ -76,19 +72,15 @@
         SELECT COUNT(*) FROM account_xyjh
         <where>
             <if test="account != null and account != ''">
-                AND account LIKE CONCAT('%', #{account}, '%')
-            </if>
-            <if test="accountName != null and accountName != ''">
-                AND account_name LIKE CONCAT('%', #{accountName}, '%')
+                AND (
+                    account LIKE CONCAT('%', #{account}, '%')
+                    OR account_name LIKE CONCAT('%', #{account}, '%')
+                    OR remark LIKE CONCAT('%', #{account}, '%')
+                    OR strong_character LIKE CONCAT('%', #{account}, '%')
+                )
             </if>
             <if test="status != null">
                 AND status = #{status}
-            </if>
-            <if test="remark != null and remark != ''">
-                AND remark LIKE CONCAT('%', #{remark}, '%')
-            </if>
-            <if test="strongCharacter != null and strongCharacter != ''">
-                AND strong_character LIKE CONCAT('%', #{strongCharacter}, '%')
             </if>
         </where>
     </select>

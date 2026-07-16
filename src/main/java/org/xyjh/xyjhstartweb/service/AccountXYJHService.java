@@ -3,15 +3,19 @@ package org.xyjh.xyjhstartweb.service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.xyjh.xyjhstartweb.dto.AccountXYJHAccountingSummary;
 import org.xyjh.xyjhstartweb.dto.CreateAccountXYJHRequest;
 import org.xyjh.xyjhstartweb.dto.PagedResult;
 import org.xyjh.xyjhstartweb.dto.QueryAccountXYJHRequest;
+import org.xyjh.xyjhstartweb.dto.SyncAccountXYJHRequest;
 import org.xyjh.xyjhstartweb.dto.UpdateAccountXYJHRequest;
 import org.xyjh.xyjhstartweb.entity.AccountXYJH;
 import org.xyjh.xyjhstartweb.mapper.AccountXYJHMapper;
 import org.xyjh.xyjhstartweb.util.Result;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -46,6 +50,86 @@ public class AccountXYJHService {
             }
         } catch (Exception e) {
             return Result.fail("创建账号时发生错误: " + e.getMessage());
+        }
+    }
+
+    public Result<AccountXYJH> syncRefreshResult(SyncAccountXYJHRequest request) {
+        try {
+            if (isBlank(request.getAccountName()) && isBlank(request.getAccount())) {
+                return Result.fail("账号名或账号至少填写一项");
+            }
+
+            AccountXYJH existingAccount = null;
+            if (!isBlank(request.getAccount())) {
+                existingAccount = accountXYJHMapper.selectAccountByAccount(request.getAccount().trim());
+            }
+            if (existingAccount == null && !isBlank(request.getAccountName())) {
+                existingAccount = accountXYJHMapper.selectAccountByAccountName(request.getAccountName().trim());
+            }
+
+            if (existingAccount == null) {
+                AccountXYJH account = new AccountXYJH();
+                account.setAccount(defaultAccountName(request));
+                account.setPassword(trimToNull(request.getPassword()));
+                account.setAccountName(defaultAccountName(request));
+                account.setGreenTicket(defaultTicket(request.getGreenTicket()));
+                account.setYellowTicket(defaultTicket(request.getYellowTicket()));
+                account.setStatus(0);
+                account.setBuyTime(LocalDateTime.now());
+                account.setUpdateTime(LocalDateTime.now());
+                account.setRemark(trimToNull(request.getRemark()));
+
+                int result = accountXYJHMapper.insertAccount(account);
+                return result > 0 ? Result.success("同步创建成功", account) : Result.fail("同步创建失败");
+            }
+
+            AccountXYJH accountToUpdate = new AccountXYJH();
+            accountToUpdate.setId(existingAccount.getId());
+            accountToUpdate.setAccount(trimToNull(request.getAccount()));
+            accountToUpdate.setPassword(trimToNull(request.getPassword()));
+            accountToUpdate.setAccountName(trimToNull(request.getAccountName()));
+            accountToUpdate.setGreenTicket(request.getGreenTicket());
+            accountToUpdate.setYellowTicket(request.getYellowTicket());
+            accountToUpdate.setRemark(trimToNull(request.getRemark()));
+            accountToUpdate.setUpdateTime(LocalDateTime.now());
+
+            int result = accountXYJHMapper.updateAccountById(accountToUpdate);
+            if (result <= 0) {
+                return Result.fail("同步更新失败");
+            }
+
+            AccountXYJH updatedAccount = accountXYJHMapper.selectAccountById(existingAccount.getId());
+            return Result.success("同步更新成功", updatedAccount);
+        } catch (Exception e) {
+            return Result.fail("同步账号时发生错误: " + e.getMessage());
+        }
+    }
+
+    public Result<AccountXYJHAccountingSummary> getAccountingSummary() {
+        try {
+            List<AccountXYJH> accounts = accountXYJHMapper.selectAccountedAccounts();
+            BigDecimal huoxinggeTotal = BigDecimal.ZERO;
+            BigDecimal kakaTotal = BigDecimal.ZERO;
+
+            for (AccountXYJH account : accounts) {
+                BigDecimal sellPrice = account.getSellPrice();
+                BigDecimal buyPrice = account.getBuyPrice();
+                if (sellPrice == null || buyPrice == null || sellPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                    continue;
+                }
+                BigDecimal adjustedSellPrice = sellPrice.subtract(sellPrice.multiply(new BigDecimal("0.006")));
+                BigDecimal kakaShare = adjustedSellPrice.subtract(buyPrice).divide(new BigDecimal("2"), 2, RoundingMode.HALF_UP);
+                kakaTotal = kakaTotal.add(kakaShare);
+                huoxinggeTotal = huoxinggeTotal.add(kakaShare);
+            }
+
+            AccountXYJHAccountingSummary summary = new AccountXYJHAccountingSummary();
+            summary.setHuoxinggeTotal(huoxinggeTotal.setScale(2, RoundingMode.HALF_UP));
+            summary.setKakaTotal(kakaTotal.setScale(2, RoundingMode.HALF_UP));
+            summary.setAccountedCount(accounts.size());
+            return Result.success(summary);
+        } catch (Exception e) {
+            return Result.fail("查询记账统计时发生错误: " + e.getMessage());
         }
     }
 
@@ -173,5 +257,29 @@ public class AccountXYJHService {
         } catch (Exception e) {
             return Result.fail("搜索账号时发生错误: " + e.getMessage());
         }
+    }
+
+    private String defaultAccountName(SyncAccountXYJHRequest request) {
+        String accountName = trimToNull(request.getAccountName());
+        if (accountName != null) {
+            return accountName;
+        }
+        return trimToNull(request.getAccount());
+    }
+
+    private Integer defaultTicket(Integer ticket) {
+        return ticket == null ? 0 : ticket;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

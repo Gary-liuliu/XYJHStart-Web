@@ -1,1024 +1,1283 @@
 <template>
-  <el-card>
-    <template #header>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span>账号买卖管理</span>
-        <el-button size="small" type="success" @click="openCreateDialog">新增账号</el-button>
-      </div>
-    </template>
-
-    <div class="search-controls">
-      <el-input
-        v-model="searchKeyword"
-        placeholder="输入关键词搜索账号"
-        style="max-width: 300px; margin-bottom: 16px;"
-        clearable
-        @keyup.enter="handleSearch"
-      >
-        <template #append>
-          <el-button @click="handleSearch">
+  <section ref="pageRoot" class="trade-console">
+    <section v-if="isMobile" class="mobile-delivery">
+      <div class="mobile-delivery-bar mobile-entrance">
+        <el-input
+          v-model="searchKeyword"
+          class="mobile-search"
+          placeholder="搜索账号"
+          clearable
+          @keyup.enter="handleSearch"
+          @clear="handleSearch"
+        >
+          <template #prefix>
             <el-icon><Search /></el-icon>
-          </el-button>
-        </template>
-      </el-input>
-    </div>
-
-    <!-- 手机模式：上方紧凑的每页条数选择器与总数 -->
-    <div class="list-controls" v-if="isMobile">
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <span>每页</span>
-        <el-select v-model="pageSize" size="small" style="width:90px" @change="handleSizeChange">
-          <el-option label="8" value="8" />
-          <el-option label="16" value="16" />
-          <el-option label="24" value="24" />
-        </el-select>
-        <span style="margin-left:auto">共 {{ total }} 条</span>
+          </template>
+        </el-input>
+        <button class="mobile-refresh" type="button" @click="loadData">
+          <el-icon><RefreshRight /></el-icon>
+        </button>
       </div>
-    </div>
 
-    <el-table
-      v-loading="loading"
-      :data="tableData"
-      border
-      stripe
-      :row-class-name="tableRowClassName"
-      :row-key="getRowKey"
-      :key="tableKey"
-      style="width: 100%"
-    >
-      <el-table-column prop="accountName" label="账号名" min-width="120" />
-      <el-table-column prop="account" label="账号" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="password" label="密码" min-width="120">
-        <template #default="{ row }">
-          <span>{{ row.password || '-' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="status" label="状态" min-width="120">
-        <template #default="{ row }">
-          <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="buyTime" label="购入时间" min-width="160">
-        <template #default="{ row }">{{ formatDate(row.buyTime) }}</template>
-      </el-table-column>
-      <el-table-column prop="buyPrice" label="购入价格" min-width="100">
-        <template #default="{ row }">{{ row.buyPrice ? `¥${row.buyPrice}` : '-' }}</template>
-      </el-table-column>
-      <el-table-column prop="greenTicket" label="绿票" min-width="100">
-        <template #default="{ row }">
-          <span v-if="editingTicket.id !== row.id || editingTicket.type !== 'green'" 
-                @dblclick="startEditingTicket(row, 'green')"
-                style="cursor: pointer;">
-            {{ row.greenTicket }}
-            <el-icon><EditPen /></el-icon>
-          </span>
-          <el-input v-else
-                    v-model="editingTicket.value"
-                    size="small"
-                    ref="greenTicketInput"
-                    @blur="saveTicketValue(editingTicket.id, 'green', editingTicket.value); editingTicket.id = null"
-                    @keyup.enter="saveTicketValue(editingTicket.id, 'green', editingTicket.value); editingTicket.id = null"
-                    @keyup.escape="editingTicket.id = null; row.greenTicket"
-                    @focus="$event.target.select()" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="yellowTicket" label="黄票" min-width="100">
-        <template #default="{ row }">
-          <span v-if="editingTicket.id !== row.id || editingTicket.type !== 'yellow'" 
-                @dblclick="startEditingTicket(row, 'yellow')"
-                style="cursor: pointer;">
-            {{ row.yellowTicket }}
-            <el-icon><EditPen /></el-icon>
-          </span>
-          <el-input v-else
-                    v-model="editingTicket.value"
-                    size="small"
-                    ref="yellowTicketInput"
-                    @blur="saveTicketValue(editingTicket.id, 'yellow', editingTicket.value); editingTicket.id = null"
-                    @keyup.enter="saveTicketValue(editingTicket.id, 'yellow', editingTicket.value); editingTicket.id = null"
-                    @keyup.escape="editingTicket.id = null; row.yellowTicket"
-                    @focus="$event.target.select()" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="sellTime" label="售出时间" min-width="160">
-        <template #default="{ row }">{{ row.sellTime ? formatDate(row.sellTime) : '-' }}</template>
-      </el-table-column>
-      <el-table-column prop="sellPrice" label="售出价格" min-width="100">
-        <template #default="{ row }">{{ row.sellPrice !== null && row.sellPrice !== undefined && row.sellPrice !== 0 ? `¥${row.sellPrice}` : '-' }}</template>
-      </el-table-column>
-      <el-table-column prop="strongCharacter" label="强力角色" min-width="120" show-overflow-tooltip>
-        <template #default="{ row }">
-          <span v-if="editingStrongCharacter.id !== row.id" 
-                @dblclick="startEditingStrongCharacter(row)"
-                style="cursor: pointer;">
-            {{ row.strongCharacter || '-' }}
-            <el-icon><EditPen /></el-icon>
-          </span>
-          <el-input v-else
-                    v-model="editingStrongCharacter.value"
-                    size="small"
-                    ref="strongCharacterInput"
-                    @blur="saveStrongCharacter(editingStrongCharacter.id, editingStrongCharacter.value); editingStrongCharacter.id = null"
-                    @keyup.enter="saveStrongCharacter(editingStrongCharacter.id, editingStrongCharacter.value); editingStrongCharacter.id = null"
-                    @keyup.escape="editingStrongCharacter.id = null; row.strongCharacter"
-                    @focus="$event.target.select()" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="remark" label="备注" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="huoxingge" label="火星哥" min-width="120">
-        <template #default="{ row }">{{ calculateHuoxingge(row) }}</template>
-      </el-table-column>
-      <el-table-column prop="kaka" label="卡卡" min-width="120">
-        <template #default="{ row }">{{ calculateKaka(row) }}</template>
-      </el-table-column>
-      <el-table-column prop="intervalDays" label="间隔天数" min-width="100">
-        <template #default="{ row }">{{ calculateIntervalDays(row) }}</template>
-      </el-table-column>
-
-      <!-- 操作列 -->
-      <el-table-column label="操作" width="100">
-        <template #default="{ row }">
-          <el-button
-            type="warning"
-            size="small"
-            @click="openSell(row)"
-          >卖出</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- 手机模式：粘底、仅 prev/pager/next，small，避免挤出页面 -->
-    <div v-if="isMobile" class="mobile-pagination">
-      <el-pagination
-        background
-        small
-        :current-page="page"
-        :page-size="pageSize"
-        layout="prev, pager, next"
-        :total="total"
-        @current-change="handleCurrentChange"
-      />
-    </div>
-
-    <!-- 桌面模式：完整布局与页尺寸选择 -->
-    <div v-else style="margin-top: 12px; display: flex; justify-content: flex-end;">
-      <el-pagination
-        background
-        :current-page="page"
-        :page-size="pageSize"
-        :page-sizes="[8, 16, 24]"
-        layout="sizes, prev, pager, next, jumper, total"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </div>
-
-    <!-- 新增/编辑账号弹框 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isEditing ? '编辑账号' : '新增账号'"
-      :width="isMobile ? '92%' : '460px'"
-    >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        :size="isMobile ? 'small' : 'default'"
-        :label-position="isMobile ? 'top' : 'right'"
-        label-width="110px"
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        :row-class-name="tableRowClassName"
+        :cell-class-name="mobileTableCellClassName"
+        :row-key="getRowKey"
+        class="mobile-account-table mobile-entrance"
+        :height="mobileTableHeight"
       >
-        <el-form-item label="账号名" prop="accountName">
+        <el-table-column label="复制" width="70" fixed="left" align="center">
+          <template #default="{ row }">
+            <button class="mobile-copy-button" type="button" @click.stop="copyAccount(row)">复制</button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="accountName" label="账号" min-width="188">
+          <template #default="{ row }">
+            <div class="mobile-account-cell">
+              <strong>{{ row.accountName || '-' }}</strong>
+              <span>{{ row.account || '-' }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="password" label="密码" min-width="102">
+          <template #default="{ row }">{{ row.password || '-' }}</template>
+        </el-table-column>
+        <el-table-column label="票券" width="126" align="center">
+          <template #default="{ row }">
+            <div class="mobile-ticket-stack">
+              <span class="mobile-ticket-value green">绿 {{ row.greenTicket ?? 0 }}</span>
+              <span class="mobile-ticket-value yellow">黄 {{ row.yellowTicket ?? 0 }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sellPrice" label="售价" width="94" align="right">
+          <template #default="{ row }">
+            <button class="mobile-price-button" type="button" @click.stop="openPriceEdit(row)">
+              {{ row.sellPrice ? formatMoney(row.sellPrice) : '填价格' }}
+            </button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态" width="96">
+          <template #default="{ row }">
+            <el-select
+              v-model="row.status"
+              class="mobile-status-select"
+              size="small"
+              @click.stop
+              @change="updateAccountStatus(row, $event)"
+            >
+              <el-option v-for="option in statusSelectOptions" :key="option.value" :label="option.label" :value="option.value" />
+            </el-select>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="mobile-pagination mobile-entrance">
+        <el-pagination
+          background
+          small
+          :current-page="page"
+          :page-size="pageSize"
+          layout="prev, pager, next"
+          :total="total"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </section>
+
+    <section v-else class="desktop-console">
+      <section class="desk-header desktop-entrance">
+        <div>
+          <p>账号买卖</p>
+          <h1>账号库存与真实记账</h1>
+        </div>
+        <div class="desk-actions">
+          <button class="console-button ghost" type="button" @click="loadData">
+            <el-icon><RefreshRight /></el-icon>
+            刷新
+          </button>
+          <button class="console-button primary" type="button" @click="openCreateDialog">
+            <el-icon><Plus /></el-icon>
+            新增账号
+          </button>
+        </div>
+      </section>
+
+      <section class="accounting-strip desktop-entrance">
+        <div class="accounting-card huoxing">
+          <span>火星哥记账</span>
+          <strong>{{ formatMoney(accountingSummary.huoxinggeTotal) }}</strong>
+        </div>
+        <div class="accounting-card kaka">
+          <span>卡卡记账</span>
+          <strong>{{ formatMoney(accountingSummary.kakaTotal) }}</strong>
+        </div>
+      </section>
+
+      <section class="table-panel desktop-entrance">
+        <div class="table-toolbar">
           <el-input
-            v-model="form.accountName"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入账号名"
-          />
-        </el-form-item>
-        <el-form-item label="账号" prop="account">
-          <el-input
-            v-model="form.account"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入账号"
-          />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="form.password"
-            :size="isMobile ? 'small' : 'default'"
-            type="text"
-            placeholder="请输入密码"
-          />
-        </el-form-item>
-        <el-form-item label="购入时间" prop="buyTime">
-          <el-config-provider :locale="locale">
-            <el-date-picker
-              v-model="form.buyTime"
-              type="datetime"
-              placeholder="请选择购入时间"
-              format="YYYY-MM-DD HH:mm:ss"
-              value-format="YYYY-MM-DD HH:mm:ss"
-              :size="isMobile ? 'small' : 'default'"
-            />
-          </el-config-provider>
-        </el-form-item>
-        <el-form-item label="购入价格" prop="buyPrice">
-          <el-input-number
-            v-model="form.buyPrice"
-            :precision="2"
-            :min="0"
-            :step="1"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入购入价格"
-            style="width: 100%;"
-          />
-        </el-form-item>
-        <el-form-item label="绿票" prop="greenTicket">
-          <el-input-number
-            v-model="form.greenTicket"
-            :min="0"
-            :step="1"
-            controls-position="right"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入绿票数量"
-          />
-        </el-form-item>
-        <el-form-item label="黄票" prop="yellowTicket">
-          <el-input-number
-            v-model="form.yellowTicket"
-            :min="0"
-            :step="1"
-            controls-position="right"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入黄票数量"
-          />
-        </el-form-item>
-        <el-form-item label="强力角色" prop="strongCharacter">
-          <el-input
-            v-model="form.strongCharacter"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入强力角色信息"
-          />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input
-            v-model="form.remark"
-            type="textarea"
-            :rows="isMobile ? 3 : 4"
-            placeholder="请输入备注"
-            :size="isMobile ? 'small' : 'default'"
-            autosize
-          />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select
-            v-model="form.status"
-            placeholder="请选择状态"
-            :size="isMobile ? 'small' : 'default'"
-            style="width: 100%;"
+            v-model="searchKeyword"
+            class="keyword-input"
+            placeholder="搜索账号名、邮箱或备注"
+            clearable
+            @keyup.enter="handleSearch"
+            @clear="handleSearch"
           >
-            <el-option label="刷票中" :value="0" />
-            <el-option label="出售中" :value="1" />
-            <el-option label="出售未收货" :value="2" />
-            <el-option label="出售完成" :value="3" />
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+
+          <el-select v-model="statusFilter" class="status-select" @change="handleSearch">
+            <el-option v-for="option in statusOptions" :key="option.value" :label="option.label" :value="option.value" />
           </el-select>
-        </el-form-item>
+
+          <button class="console-button ghost" type="button" @click="handleSearch">
+            <el-icon><Operation /></el-icon>
+            查询
+          </button>
+        </div>
+
+        <el-table
+          v-loading="loading"
+          :data="tableData"
+          :row-class-name="tableRowClassName"
+          :row-key="getRowKey"
+          class="account-table"
+          :height="desktopTableHeight"
+        >
+          <el-table-column prop="accountName" label="账号名" min-width="132" />
+          <el-table-column prop="account" label="账号" min-width="178" show-overflow-tooltip />
+          <el-table-column prop="password" label="密码" width="118">
+            <template #default="{ row }">{{ row.password || '-' }}</template>
+          </el-table-column>
+          <el-table-column prop="status" label="状态" width="108">
+            <template #default="{ row }">
+              <el-select
+                v-model="row.status"
+                class="status-inline-select"
+                size="small"
+                @change="updateAccountStatus(row, $event)"
+              >
+                <el-option v-for="option in statusSelectOptions" :key="option.value" :label="option.label" :value="option.value" />
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="票券" min-width="184">
+            <template #default="{ row }">
+              <div class="ticket-stack">
+                <button class="editable-value green" type="button" @click.stop="startEditingTicket(row, 'green')">
+                  绿 {{ row.greenTicket ?? 0 }}
+                </button>
+                <button class="editable-value yellow" type="button" @click.stop="startEditingTicket(row, 'yellow')">
+                  黄 {{ row.yellowTicket ?? 0 }}
+                </button>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="buyPrice" label="购入价" width="96" align="right">
+            <template #default="{ row }">{{ formatMoney(row.buyPrice) }}</template>
+          </el-table-column>
+          <el-table-column prop="sellPrice" label="售出价" width="96" align="right">
+            <template #default="{ row }">
+              <button class="price-edit" type="button" @click.stop="openPriceEdit(row)">
+                {{ row.sellPrice ? formatMoney(row.sellPrice) : '填价格' }}
+              </button>
+            </template>
+          </el-table-column>
+          <el-table-column label="火星哥" width="104" align="right">
+            <template #default="{ row }">{{ calculateHuoxingge(row) }}</template>
+          </el-table-column>
+          <el-table-column label="卡卡" width="104" align="right">
+            <template #default="{ row }">{{ calculateKaka(row) }}</template>
+          </el-table-column>
+          <el-table-column prop="strongCharacter" label="强力角色" min-width="126" show-overflow-tooltip>
+            <template #default="{ row }">
+              <button class="text-edit" type="button" @click.stop="startEditingStrongCharacter(row)">
+                {{ row.strongCharacter || '补充角色' }}
+              </button>
+            </template>
+          </el-table-column>
+          <el-table-column prop="buyTime" label="购入时间" min-width="148">
+            <template #default="{ row }">{{ formatDate(row.buyTime) }}</template>
+          </el-table-column>
+          <el-table-column prop="sellTime" label="售出时间" min-width="148">
+            <template #default="{ row }">{{ formatDate(row.sellTime) }}</template>
+          </el-table-column>
+          <el-table-column label="周期" width="76" align="center">
+            <template #default="{ row }">{{ calculateIntervalDays(row) }}</template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注" min-width="150" show-overflow-tooltip />
+          <el-table-column label="操作" width="206" fixed="right">
+            <template #default="{ row }">
+              <div class="row-actions">
+                <el-button size="small" :icon="EditPen" @click.stop="openEdit(row)">编辑</el-button>
+                <el-button size="small" type="warning" :icon="Sell" @click.stop="openSell(row)">卖出</el-button>
+                <el-button size="small" type="primary" plain :icon="CopyDocument" @click.stop="copyAccount(row)">复制</el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div class="pagination-bar">
+          <el-pagination
+            background
+            :current-page="page"
+            :page-size="pageSize"
+            :page-sizes="[16, 24, 40, 80]"
+            layout="sizes, prev, pager, next, jumper, total"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+      </section>
+    </section>
+
+    <el-dialog v-model="dialogVisible" :title="isEditing ? '编辑账号' : '新增账号'" :width="dialogWidth">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="92px" :label-position="isMobile ? 'top' : 'right'">
+        <div class="form-grid">
+          <el-form-item label="账号名" prop="accountName">
+            <el-input v-model="form.accountName" placeholder="请输入账号名" />
+          </el-form-item>
+          <el-form-item label="账号" prop="account">
+            <el-input v-model="form.account" placeholder="请输入账号" />
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="form.password" placeholder="请输入密码" />
+          </el-form-item>
+          <el-form-item label="状态" prop="status">
+            <el-select v-model="form.status" style="width: 100%">
+              <el-option v-for="option in statusSelectOptions" :key="option.value" :label="option.label" :value="option.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="购入时间" prop="buyTime">
+            <el-date-picker v-model="form.buyTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="购入价" prop="buyPrice">
+            <el-input-number v-model="form.buyPrice" :precision="2" :min="0" :step="1" controls-position="right" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="绿票" prop="greenTicket">
+            <el-input-number v-model="form.greenTicket" :min="0" :step="1" controls-position="right" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="黄票" prop="yellowTicket">
+            <el-input-number v-model="form.yellowTicket" :min="0" :step="1" controls-position="right" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="强力角色" prop="strongCharacter">
+            <el-input v-model="form.strongCharacter" placeholder="例如：限定角色、强力组合" />
+          </el-form-item>
+          <el-form-item class="full-row" label="备注" prop="remark">
+            <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注" />
+          </el-form-item>
+        </div>
       </el-form>
       <template #footer>
-        <div style="text-align:right;">
-          <el-button
-            @click="dialogVisible = false"
-            :disabled="submitting"
-            :size="isMobile ? 'small' : 'default'"
-          >取消</el-button>
-          <el-button
-            type="primary"
-            @click="submitForm"
-            :loading="submitting"
-            :size="isMobile ? 'small' : 'default'"
-          >{{ isEditing ? '更新' : '创建' }}</el-button>
-        </div>
+        <el-button :disabled="submitting" @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitForm">{{ isEditing ? '更新' : '创建' }}</el-button>
       </template>
     </el-dialog>
 
-    <!-- 卖出账号弹框 -->
-    <el-dialog
-      v-model="sellDialogVisible"
-      title="卖出账号"
-      :width="isMobile ? '92%' : '460px'"
-    >
-      <el-form
-        ref="sellFormRef"
-        :model="sellForm"
-        :rules="sellRules"
-        :size="isMobile ? 'small' : 'default'"
-        :label-position="isMobile ? 'top' : 'right'"
-        label-width="110px"
-      >
-        <el-form-item label="售出时间" prop="sellTime">
-          <el-config-provider :locale="locale">
-            <el-date-picker
-              v-model="sellForm.sellTime"
-              type="datetime"
-              placeholder="请选择售出时间"
-              format="YYYY-MM-DD HH:mm:ss"
-              value-format="YYYY-MM-DD HH:mm:ss"
-              :size="isMobile ? 'small' : 'default'"
-            />
-          </el-config-provider>
+    <el-dialog v-model="sellDialogVisible" title="账号卖出" :width="dialogWidth">
+      <el-form label-width="92px" :label-position="isMobile ? 'top' : 'right'">
+        <el-form-item label="账号名">
+          <el-input :model-value="activeAccount?.accountName || '-'" disabled />
         </el-form-item>
-        <el-form-item label="售出价格" prop="sellPrice">
-          <el-input-number
-            v-model="sellForm.sellPrice"
-            :precision="2"
-            :min="0"
-            :step="1"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入售出价格"
-            style="width: 100%;"
-          />
+        <el-form-item label="售出价">
+          <el-input-number v-model="sellForm.sellPrice" :precision="2" :min="0" :step="1" controls-position="right" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select
-            v-model="sellForm.status"
-            placeholder="请选择状态"
-            :size="isMobile ? 'small' : 'default'"
-            style="width: 100%;"
-          >
-            <el-option label="出售中" :value="1" />
-            <el-option label="出售未收货" :value="2" />
-            <el-option label="出售完成" :value="3" />
-          </el-select>
+        <el-form-item label="售出时间">
+          <el-date-picker v-model="sellForm.sellTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <div style="text-align:right;">
-          <el-button
-            @click="sellDialogVisible = false"
-            :disabled="sellSubmitting"
-            :size="isMobile ? 'small' : 'default'"
-          >取消</el-button>
-          <el-button
-            type="primary"
-            @click="submitSell"
-            :loading="sellSubmitting"
-            :size="isMobile ? 'small' : 'default'"
-          >确认卖出</el-button>
-        </div>
+        <el-button :disabled="submitting" @click="sellDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitSell">确认卖出</el-button>
       </template>
     </el-dialog>
 
-    <!-- 刷票账号弹框 -->
-    <el-dialog
-      v-model="brushDialogVisible"
-      title="刷票账号"
-      :width="isMobile ? '92%' : '460px'"
-    >
-      <el-form
-        ref="brushFormRef"
-        :model="brushForm"
-        :rules="brushRules"
-        :size="isMobile ? 'small' : 'default'"
-        :label-position="isMobile ? 'top' : 'right'"
-        label-width="110px"
-      >
-        <el-form-item label="绿票" prop="greenTicket">
-          <el-input-number
-            v-model="brushForm.greenTicket"
-            :min="0"
-            :step="1"
-            controls-position="right"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入绿票数量"
-          />
-        </el-form-item>
-        <el-form-item label="黄票" prop="yellowTicket">
-          <el-input-number
-            v-model="brushForm.yellowTicket"
-            :min="0"
-            :step="1"
-            controls-position="right"
-            :size="isMobile ? 'small' : 'default'"
-            placeholder="请输入黄票数量"
-          />
-        </el-form-item>
-      </el-form>
+    <el-dialog v-model="ticketDialogVisible" :title="ticketEditTitle" width="360px">
+      <el-input-number v-model="ticketForm.value" :min="0" :step="1" controls-position="right" style="width: 100%" />
       <template #footer>
-        <div style="text-align:right;">
-          <el-button
-            @click="brushDialogVisible = false"
-            :disabled="brushSubmitting"
-            :size="isMobile ? 'small' : 'default'"
-          >取消</el-button>
-          <el-button
-            type="primary"
-            @click="submitBrush"
-            :loading="brushSubmitting"
-            :size="isMobile ? 'small' : 'default'"
-          >确认刷票</el-button>
-        </div>
+        <el-button :disabled="submitting" @click="ticketDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitTicketEdit">保存</el-button>
       </template>
     </el-dialog>
 
-  </el-card>
+    <el-dialog v-model="priceDialogVisible" title="修改售价" width="360px">
+      <el-input-number v-model="priceForm.sellPrice" :precision="2" :min="0" :step="1" controls-position="right" style="width: 100%" />
+      <template #footer>
+        <el-button :disabled="submitting" @click="priceDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitPriceEdit">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="strongCharacterDialogVisible" title="修改强力角色" :width="dialogWidth">
+      <el-input v-model="strongCharacterForm.strongCharacter" placeholder="请输入强力角色" />
+      <template #footer>
+        <el-button :disabled="submitting" @click="strongCharacterDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitStrongCharacterEdit">保存</el-button>
+      </template>
+    </el-dialog>
+  </section>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
-import api from '../utils/api'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, EditPen } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
-import { ElConfigProvider } from 'element-plus'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import { ElMessage } from 'element-plus'
+import { CopyDocument, EditPen, Operation, Plus, RefreshRight, Search, Sell } from '@element-plus/icons-vue'
+import { gsap } from 'gsap'
+import api from '../utils/api'
 
-const router = useRouter()
-const locale = zhCn
+const pageRoot = ref(null)
 const loading = ref(false)
+const submitting = ref(false)
 const tableData = ref([])
-const tableKey = ref(0)
-
-// 双击编辑票券相关
-const editingTicket = ref({
-  id: null,
-  type: null, // 'green' 或 'yellow'
-  value: null
-})
-
-// 双击编辑强力角色相关
-const editingStrongCharacter = ref({
-  id: null,
-  value: null
-})
-
 const page = ref(1)
-const pageSize = ref(8)
+const pageSize = ref(16)
 const total = ref(0)
-
-// 添加搜索相关变量
 const searchKeyword = ref('')
+const statusFilter = ref('')
+const dialogVisible = ref(false)
+const sellDialogVisible = ref(false)
+const ticketDialogVisible = ref(false)
+const priceDialogVisible = ref(false)
+const strongCharacterDialogVisible = ref(false)
+const isEditing = ref(false)
+const activeAccount = ref(null)
+const formRef = ref(null)
+let pageAnimationContext
 
-// 根据屏幕宽度动态判断是否为手机模式
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('md')
+const dialogWidth = computed(() => (isMobile.value ? '92vw' : '720px'))
+const mobileTableHeight = computed(() => '100%')
+const desktopTableHeight = computed(() => 'calc(100vh - 254px)')
+
+const statusSelectOptions = [
+  { label: '刷票中', value: 0 },
+  { label: '出售中', value: 1 },
+  { label: '未收款', value: 2 },
+  { label: '已完成', value: 3 }
+]
+
+const statusOptions = [
+  { label: '全部状态', value: '' },
+  ...statusSelectOptions
+]
+
+const accountingSummary = reactive({
+  huoxinggeTotal: 0,
+  kakaTotal: 0,
+  accountedCount: 0
+})
+
+const form = reactive({
+  id: null,
+  account: '',
+  password: '',
+  accountName: '',
+  buyTime: '',
+  status: 0,
+  buyPrice: 0,
+  greenTicket: 0,
+  yellowTicket: 0,
+  strongCharacter: '',
+  remark: ''
+})
+
+const sellForm = reactive({
+  sellPrice: 0,
+  sellTime: ''
+})
+
+const ticketForm = reactive({
+  account: null,
+  type: 'green',
+  value: 0
+})
+
+const priceForm = reactive({
+  account: null,
+  sellPrice: 0
+})
+
+const strongCharacterForm = reactive({
+  account: null,
+  strongCharacter: ''
+})
+
+const rules = {
+  accountName: [{ required: true, message: '请输入账号名', trigger: 'blur' }],
+  account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+}
+
+const ticketEditTitle = computed(() => (ticketForm.type === 'green' ? '修改绿票' : '修改黄票'))
+
+const nowDateTime = () => {
+  const date = new Date()
+  const pad = (value) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
+const normalizeListResponse = (res) => {
+  if (Array.isArray(res)) {
+    return { list: res, totalCount: res.length }
+  }
+  return {
+    list: res?.content || res?.records || res?.list || [],
+    totalCount: res?.totalElements ?? res?.total ?? res?.totalCount ?? 0
+  }
+}
 
 const loadData = async () => {
   loading.value = true
   try {
-    const response = await api.post('/api/account-xyjh/list', {
+    const keyword = searchKeyword.value.trim()
+    const params = {
       page: page.value - 1,
-      size: pageSize.value,
-      keyword: searchKeyword.value
-    })
-    
-    // 响应拦截器已经处理了Result包装，直接使用response即可
-    tableData.value = response.content || response.records || response
-    total.value = response.totalElements || response.total || 0
-    // 更新表格key以强制刷新样式
-    tableKey.value++
-  } catch (e) {
-    console.error('加载账号失败:', e)
-    if (e.response && e.response.status === 403) {
-      ElMessage.error('权限不足或登录已过期，请重新登录')
-      // 重定向到登录页
-      router.push('/login')
-    } else {
-      // 检查是否有后端返回的具体错误信息
-      if (e.response && e.response.data && e.response.data.message) {
-        ElMessage.error(e.response.data.message)
-      } else {
-        ElMessage.error(e.message || '加载账号失败')
-      }
+      size: pageSize.value
     }
+
+    if (keyword) {
+      params.account = keyword
+    }
+
+    if (statusFilter.value !== '') {
+      params.status = statusFilter.value
+    }
+
+    const res = await api.post('/api/account-xyjh/list', params)
+    const normalized = normalizeListResponse(res)
+    tableData.value = normalized.list
+    total.value = normalized.totalCount
+    await nextTick()
+    animateTableRows()
+  } catch (error) {
+    ElMessage.error(error.message || '账号列表加载失败')
   } finally {
     loading.value = false
   }
 }
 
-// 处理搜索事件
-const handleSearch = () => {
-  page.value = 1 // 搜索时回到第一页
-  loadData()
+const loadAccountingSummary = async () => {
+  try {
+    const res = await api.get('/api/account-xyjh/accounting-summary')
+    accountingSummary.huoxinggeTotal = res?.huoxinggeTotal ?? 0
+    accountingSummary.kakaTotal = res?.kakaTotal ?? 0
+    accountingSummary.accountedCount = res?.accountedCount ?? 0
+  } catch (error) {
+    ElMessage.error(error.message || '记账统计加载失败')
+  }
 }
 
-const handleSizeChange = (val) => {
-  pageSize.value = val
+const handleSearch = () => {
   page.value = 1
   loadData()
 }
 
-const handleCurrentChange = (val) => {
-  page.value = val
+const handleSizeChange = (size) => {
+  pageSize.value = size
+  page.value = 1
   loadData()
 }
 
-const statusType = (status) => {
-  switch (status) {
-    case 0: return 'info' // 刷票中
-    case 1: return 'primary' // 出售中
-    case 2: return 'warning' // 出售未收货
-    case 3: return 'success' // 出售完成
-    default: return ''
-  }
-}
-
-const statusText = (status) => {
-  switch (status) {
-    case 0: return '刷票中'
-    case 1: return '出售中'
-    case 2: return '出售未收货'
-    case 3: return '出售完成'
-    default: return '未知'
-  }
-}
-
-const formatDate = (str) => {
-  if (!str) return '-'
-  const d = new Date(str)
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
-}
-
-const getPasswordDisplay = (password) => {
-  return password || '-'
-}
-
-// 计算火星哥：购入金额 + ((售出金额 - 手续费) - 购入金额) / 2
-const calculateHuoxingge = (row) => {
-  if (row.sellPrice == null || row.sellPrice === undefined || row.sellPrice === 0) {
-    return '-';
-  }
-  const fee = row.sellPrice * 0.006; // 计算手续费为售出金额的0.006倍
-  const adjustedSellPrice = row.sellPrice - fee; // 扣除手续费
-  const result = row.buyPrice + (adjustedSellPrice - row.buyPrice) / 2;
-  return isNaN(result) ? '-' : `¥${result.toFixed(2)}`;
-}
-
-// 计算卡卡：((售出金额 - 手续费) - 购入金额) / 2
-const calculateKaka = (row) => {
-  if (row.sellPrice == null || row.sellPrice === undefined || row.sellPrice === 0) {
-    return '-';
-  }
-  const fee = row.sellPrice * 0.006; // 计算手续费为售出金额的0.006倍
-  const adjustedSellPrice = row.sellPrice - fee; // 扣除手续费
-  const result = (adjustedSellPrice - row.buyPrice) / 2;
-  return isNaN(result) ? '-' : `¥${result.toFixed(2)}`;
-}
-
-// 计算间隔天数：售出时间减去购入时间的天数
-const calculateIntervalDays = (row) => {
-  if (!row.buyTime || !row.sellTime) {
-    return '-';
-  }
-  
-  // 将时间字符串转换为Date对象
-  const buyDate = new Date(row.buyTime);
-  const sellDate = new Date(row.sellTime);
-  
-  // 检查日期是否有效
-  if (isNaN(buyDate.getTime()) || isNaN(sellDate.getTime())) {
-    return '-';
-  }
-  
-  // 计算毫秒差
-  const diffInMs = sellDate.getTime() - buyDate.getTime();
-  
-  // 转换为天数（1天 = 24 * 60 * 60 * 1000 毫秒）
-  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
-  
-  return diffInDays >= 0 ? `${diffInDays}天` : `${diffInDays}天`;
-}
-
-// 表单相关
-const dialogVisible = ref(false)
-const isEditing = ref(false)
-const submitting = ref(false)
-const formRef = ref(null)
-const form = reactive({
-  id: null,
-  account: '',
-  password: 'xh112233',
-  accountName: '',
-  buyTime: new Date(),
-  buyPrice: null,
-  greenTicket: 0,
-  yellowTicket: 0,
-  sellTime: null,
-  sellPrice: null,
-  strongCharacter: '',
-  remark: '',
-  status: 0
-})
-
-// 卖出相关
-const sellDialogVisible = ref(false)
-const sellSubmitting = ref(false)
-const sellFormRef = ref(null)
-const sellForm = reactive({
-  id: null,
-  sellTime: null,
-  sellPrice: null,
-  status: 1 // 默认为出售中
-})
-
-// 刷票相关
-const brushDialogVisible = ref(false)
-const brushSubmitting = ref(false)
-const brushFormRef = ref(null)
-const brushForm = reactive({
-  id: null,
-  greenTicket: 0,
-  yellowTicket: 0
-})
-
-// 卖出表单验证规则
-const sellRules = {
-  sellTime: [
-    { required: true, message: '请选择售出时间', trigger: 'change' }
-  ],
-  sellPrice: [
-    { required: true, message: '请输入售出价格', trigger: 'blur' },
-    { type: 'number', min: 0, message: '价格不能小于0', trigger: 'blur' }
-  ]
-}
-
-// 刷票表单验证规则
-const brushRules = {
-  greenTicket: [
-    { required: true, message: '请输入绿票数量', trigger: 'blur' },
-    { type: 'number', min: 0, message: '数量不能小于0', trigger: 'blur' }
-  ],
-  yellowTicket: [
-    { required: true, message: '请输入黄票数量', trigger: 'blur' },
-    { type: 'number', min: 0, message: '数量不能小于0', trigger: 'blur' }
-  ]
-}
-
-// 表单验证规则
-const rules = {
-  accountName: [
-    { required: true, message: '请输入账号名', trigger: 'blur' }
-  ],
-  account: [
-    { required: true, message: '请输入账号', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
-  ],
-  buyTime: [
-    { required: true, message: '请选择购入时间', trigger: 'change' }
-  ],
-  buyPrice: [
-    { required: true, message: '请输入购入价格', trigger: 'blur' },
-    { type: 'number', min: 0, message: '价格不能小于0', trigger: 'blur' }
-  ]
+const handleCurrentChange = (currentPage) => {
+  page.value = currentPage
+  loadData()
 }
 
 const resetForm = () => {
-  Object.keys(form).forEach(key => {
-    if (key === 'greenTicket' || key === 'yellowTicket') {
-      form[key] = 0
-    } else if (key === 'status') {
-      form[key] = 0
-    } else if (key === 'password') {
-      form[key] = 'xh112233'
-    } else if (key === 'buyTime') {
-      // 格式化当前时间为 YYYY-MM-DD HH:mm:ss 格式
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      form[key] = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    } else if (key !== 'id') {
-      form[key] = null
-    }
+  Object.assign(form, {
+    id: null,
+    account: '',
+    password: 'xh112233',
+    accountName: getNextNumericAccountName(),
+    buyTime: nowDateTime(),
+    status: 0,
+    buyPrice: 0,
+    greenTicket: 0,
+    yellowTicket: 0,
+    strongCharacter: '',
+    remark: ''
   })
-  form.id = null
 }
 
 const openCreateDialog = () => {
   resetForm()
   isEditing.value = false
   dialogVisible.value = true
+  nextTick(() => formRef.value?.clearValidate?.())
+}
+
+const getNextNumericAccountName = () => {
+  const latestAccountName = String(tableData.value.find((account) => account.accountName)?.accountName || '').trim()
+  if (!/^\d+$/.test(latestAccountName)) {
+    return ''
+  }
+  return String(Number(latestAccountName) + 1)
 }
 
 const openEdit = (row) => {
-  Object.keys(form).forEach(key => {
-    form[key] = row[key]
+  resetForm()
+  Object.assign(form, {
+    ...row,
+    buyTime: formatDateTimeInput(row.buyTime),
+    status: Number(row.status ?? 0),
+    buyPrice: Number(row.buyPrice ?? 0),
+    greenTicket: Number(row.greenTicket ?? 0),
+    yellowTicket: Number(row.yellowTicket ?? 0)
   })
   isEditing.value = true
   dialogVisible.value = true
+  nextTick(() => formRef.value?.clearValidate?.())
 }
 
 const submitForm = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      if (isEditing.value) {
-        // 更新账号
-        await api.put('/api/account-xyjh/update', form)
-      } else {
-        // 创建账号
-        await api.post('/api/account-xyjh/create', form)
-      }
-      
-      ElMessage.success(isEditing.value ? '更新成功' : '创建成功')
-      dialogVisible.value = false
-      loadData()
-    } catch (e) {
-      if (e.response && e.response.status === 403) {
-        ElMessage.error('权限不足或登录已过期，请重新登录')
-        router.push('/login')
-      } else {
-        // 检查是否有后端返回的具体错误信息
-        if (e.response && e.response.data && e.response.data.message) {
-          ElMessage.error(e.response.data.message)
-        } else {
-          ElMessage.error(e.message || (isEditing.value ? '更新失败' : '创建失败'))
-        }
-      }
-    } finally {
-      submitting.value = false
-    }
-  })
-}
+  const valid = await formRef.value.validate().catch(() => false)
+  if (!valid) return
 
-const deleteAccount = async (id) => {
+  submitting.value = true
   try {
-    await ElMessageBox.confirm(
-      '确定要删除这个账号吗？',
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-    
-    await api.delete(`/api/account-xyjh/delete/${id}`)
-    ElMessage.success('删除成功')
-    loadData()
-  } catch (e) {
-    if (e !== 'cancel') {
-      if (e.response && e.response.status === 403) {
-        ElMessage.error('权限不足或登录已过期，请重新登录')
-        router.push('/login')
-      } else {
-        // 检查是否有后端返回的具体错误信息
-        if (e.response && e.response.data && e.response.data.message) {
-          ElMessage.error(e.response.data.message)
-        } else {
-          ElMessage.error(e.message || '删除失败')
-        }
-      }
-    }
-  }
-}
-
-// 开始编辑票券数量
-const startEditingTicket = (row, ticketType) => {
-  editingTicket.value = {
-    id: row.id,
-    type: ticketType,
-    value: ticketType === 'green' ? row.greenTicket : row.yellowTicket
-  }
-  // 延迟聚焦以确保DOM更新完成
-  setTimeout(() => {
-    const input = ticketType === 'green' ? document.querySelector('[ref="greenTicketInput"] input') : document.querySelector('[ref="yellowTicketInput"] input')
-    if (input) {
-      input.focus()
-      input.select()
-    }
-  }, 0)
-}
-
-// 开始编辑强力角色
-const startEditingStrongCharacter = (row) => {
-  editingStrongCharacter.value = {
-    id: row.id,
-    value: row.strongCharacter || ''
-  }
-  // 延迟聚焦以确保DOM更新完成
-  setTimeout(() => {
-    const input = document.querySelector('[ref="strongCharacterInput"] input')
-    if (input) {
-      input.focus()
-      input.select()
-    }
-  }, 0)
-}
-
-// 保存票券值到后端
-const saveTicketValue = async (id, ticketType, value) => {
-  try {
-    const updateData = {
-      id: id
-    }
-    
-    if (ticketType === 'green') {
-      updateData.greenTicket = value
+    const payload = { ...form }
+    if (isEditing.value) {
+      await api.put('/api/account-xyjh/update', payload)
+      ElMessage.success('账号已更新')
     } else {
-      updateData.yellowTicket = value
+      delete payload.id
+      await api.post('/api/account-xyjh/create', payload)
+      ElMessage.success('账号已新增')
     }
-    
-    await api.put('/api/account-xyjh/update', updateData)
-    ElMessage.success(`${ticketType === 'green' ? '绿票' : '黄票'}更新成功`)
-    
-    // 更新本地数据
-    const row = tableData.value.find(item => item.id === id)
-    if (row) {
-      if (ticketType === 'green') {
-        row.greenTicket = value
-      } else {
-        row.yellowTicket = value
-      }
-    }
+    dialogVisible.value = false
+    await Promise.all([loadData(), loadAccountingSummary()])
   } catch (error) {
-    console.error(`更新${ticketType === 'green' ? '绿票' : '黄票'}失败:`, error)
-    ElMessage.error(`${ticketType === 'green' ? '绿票' : '黄票'}更新失败`)
-    
-    if (error.response && error.response.status === 403) {
-      ElMessage.error('权限不足或登录已过期，请重新登录')
-      router.push('/login')
-    }
-  }
-}
-
-// 保存强力角色到后端
-const saveStrongCharacter = async (id, value) => {
-  try {
-    const updateData = {
-      id: id,
-      strongCharacter: value
-    }
-    
-    await api.put('/api/account-xyjh/update', updateData)
-    ElMessage.success('强力角色更新成功')
-    
-    // 更新本地数据
-    const row = tableData.value.find(item => item.id === id)
-    if (row) {
-      row.strongCharacter = value
-    }
-  } catch (error) {
-    console.error('更新强力角色失败:', error)
-    ElMessage.error('强力角色更新失败')
-    
-    if (error.response && error.response.status === 403) {
-      ElMessage.error('权限不足或登录已过期，请重新登录')
-      router.push('/login')
-    }
+    ElMessage.error(error.message || '保存账号失败')
+  } finally {
+    submitting.value = false
   }
 }
 
 const openSell = (row) => {
-  sellForm.id = row.id
-  // 设置售出时间为当前时间
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  sellForm.sellTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  sellForm.sellPrice = row.sellPrice
-  // 卖出时默认状态设为"出售中"，而不是原始状态
-  sellForm.status = 1
+  activeAccount.value = row
+  sellForm.sellPrice = Number(row.sellPrice ?? 0)
+  sellForm.sellTime = formatDateTimeInput(row.sellTime) || nowDateTime()
   sellDialogVisible.value = true
 }
 
 const submitSell = async () => {
-  if (!sellFormRef.value) return
-  await sellFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    sellSubmitting.value = true
-    try {
-      // 创建一个包含ID和其他需要更新字段的对象
-      const updateData = {
-        id: sellForm.id,
-        sellTime: sellForm.sellTime,
-        sellPrice: sellForm.sellPrice,
-        status: sellForm.status
-      }
-      await api.put('/api/account-xyjh/update', updateData)
-      ElMessage.success('卖出信息更新成功')
-      sellDialogVisible.value = false
-      loadData()
-    } catch (e) {
-      if (e.response && e.response.status === 403) {
-        ElMessage.error('权限不足或登录已过期，请重新登录')
-        router.push('/login')
-      } else {
-        ElMessage.error(e.message || '卖出信息更新失败')
-      }
-    } finally {
-      sellSubmitting.value = false
-    }
+  if (!activeAccount.value?.id) return
+  submitting.value = true
+  try {
+    await updateAccountFields(activeAccount.value, {
+      sellPrice: sellForm.sellPrice,
+      sellTime: sellForm.sellTime,
+      status: 3
+    })
+    sellDialogVisible.value = false
+    ElMessage.success('卖出信息已保存')
+    await Promise.all([loadData(), loadAccountingSummary()])
+  } catch (error) {
+    ElMessage.error(error.message || '卖出保存失败')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const startEditingTicket = (row, type) => {
+  ticketForm.account = row
+  ticketForm.type = type
+  ticketForm.value = Number(type === 'green' ? row.greenTicket ?? 0 : row.yellowTicket ?? 0)
+  ticketDialogVisible.value = true
+}
+
+const submitTicketEdit = async () => {
+  if (!ticketForm.account?.id) return
+  submitting.value = true
+  try {
+    const field = ticketForm.type === 'green' ? 'greenTicket' : 'yellowTicket'
+    await updateAccountFields(ticketForm.account, { [field]: ticketForm.value })
+    ticketDialogVisible.value = false
+    ElMessage.success('票券已更新')
+    await loadData()
+  } catch (error) {
+    ElMessage.error(error.message || '票券更新失败')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const openPriceEdit = (row) => {
+  priceForm.account = row
+  priceForm.sellPrice = Number(row.sellPrice ?? 0)
+  priceDialogVisible.value = true
+}
+
+const submitPriceEdit = async () => {
+  if (!priceForm.account?.id) return
+  submitting.value = true
+  try {
+    await updateAccountFields(priceForm.account, { sellPrice: priceForm.sellPrice })
+    priceDialogVisible.value = false
+    ElMessage.success('售价已更新')
+    await Promise.all([loadData(), loadAccountingSummary()])
+  } catch (error) {
+    ElMessage.error(error.message || '售价更新失败')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const startEditingStrongCharacter = (row) => {
+  strongCharacterForm.account = row
+  strongCharacterForm.strongCharacter = row.strongCharacter || ''
+  strongCharacterDialogVisible.value = true
+}
+
+const submitStrongCharacterEdit = async () => {
+  if (!strongCharacterForm.account?.id) return
+  submitting.value = true
+  try {
+    await updateAccountFields(strongCharacterForm.account, {
+      strongCharacter: strongCharacterForm.strongCharacter
+    })
+    strongCharacterDialogVisible.value = false
+    ElMessage.success('强力角色已更新')
+    await loadData()
+  } catch (error) {
+    ElMessage.error(error.message || '强力角色更新失败')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const updateAccountStatus = async (row, status) => {
+  const previousStatus = row.status
+  row.status = status
+  try {
+    await updateAccountFields(row, { status })
+    ElMessage.success('状态已更新')
+    await Promise.all([loadData(), loadAccountingSummary()])
+  } catch (error) {
+    row.status = previousStatus
+    ElMessage.error(error.message || '状态更新失败')
+  }
+}
+
+const updateAccountFields = (row, fields) => {
+  return api.put('/api/account-xyjh/update', {
+    id: row.id,
+    ...fields
   })
 }
 
-const openBrush = (row) => {
-  brushForm.id = row.id
-  brushForm.greenTicket = row.greenTicket
-  brushForm.yellowTicket = row.yellowTicket
-  brushDialogVisible.value = true
+const copyAccount = async (row) => {
+  const text = `账号名：${row.accountName || ''}\n账号：${row.account || ''}\n密码：${row.password || ''}`
+  try {
+    await writeClipboardText(text)
+    ElMessage.success('账号已复制')
+  } catch (error) {
+    ElMessage.error('复制失败，请手动复制')
+  }
 }
 
-const submitBrush = async () => {
-  if (!brushFormRef.value) return
-  await brushFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    brushSubmitting.value = true
-    try {
-      // 创建一个包含ID和其他需要更新字段的对象
-      const updateData = {
-        id: brushForm.id,
-        greenTicket: brushForm.greenTicket,
-        yellowTicket: brushForm.yellowTicket
-      }
-      await api.put('/api/account-xyjh/update', updateData)
-      ElMessage.success('刷票信息更新成功')
-      brushDialogVisible.value = false
-      loadData()
-    } catch (e) {
-      if (e.response && e.response.status === 403) {
-        ElMessage.error('权限不足或登录已过期，请重新登录')
-        router.push('/login')
-      } else {
-        ElMessage.error(e.message || '刷票信息更新失败')
-      }
-    } finally {
-      brushSubmitting.value = false
-    }
+const writeClipboardText = async (text) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.top = '-9999px'
+  textarea.style.left = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.focus()
+  textarea.select()
+  const ok = document.execCommand('copy')
+  document.body.removeChild(textarea)
+  if (!ok) {
+    throw new Error('copy failed')
+  }
+}
+
+const calculateProfitValues = (row) => {
+  const sellPrice = Number(row.sellPrice ?? 0)
+  const buyPrice = Number(row.buyPrice ?? 0)
+  if (!sellPrice || !buyPrice) {
+    return null
+  }
+  const adjustedSellPrice = sellPrice - sellPrice * 0.006
+  const kaka = (adjustedSellPrice - buyPrice) / 2
+  const huoxingge = buyPrice + kaka
+  return { kaka, huoxingge }
+}
+
+const calculateHuoxingge = (row) => {
+  const values = calculateProfitValues(row)
+  return values ? formatMoney(values.huoxingge) : '-'
+}
+
+const calculateKaka = (row) => {
+  const values = calculateProfitValues(row)
+  return values ? formatMoney(values.kaka) : '-'
+}
+
+const calculateIntervalDays = (row) => {
+  if (!row.buyTime || !row.sellTime) return '-'
+  const buy = new Date(row.buyTime)
+  const sell = new Date(row.sellTime)
+  if (Number.isNaN(buy.getTime()) || Number.isNaN(sell.getTime())) return '-'
+  const days = Math.ceil((sell.getTime() - buy.getTime()) / 86400000)
+  return `${Math.max(days, 0)}天`
+}
+
+const formatMoney = (value) => {
+  const number = Number(value ?? 0)
+  if (!Number.isFinite(number)) return '¥0.00'
+  return `¥${number.toFixed(2)}`
+}
+
+const formatDate = (value) => {
+  if (!value) return '-'
+  return String(value).replace('T', ' ').slice(0, 16)
+}
+
+const formatDateTimeInput = (value) => {
+  if (!value) return ''
+  return String(value).replace('T', ' ').slice(0, 19)
+}
+
+const statusText = (status) => {
+  return statusSelectOptions.find((option) => option.value === Number(status))?.label || '未知'
+}
+
+const statusType = (status) => {
+  const value = Number(status)
+  if (value === 0) return 'primary'
+  if (value === 1) return 'warning'
+  if (value === 2) return 'danger'
+  if (value === 3) return 'success'
+  return 'info'
+}
+
+const tableRowClassName = ({ row }) => `status-${Number(row.status ?? 0)}`
+
+const mobileTableCellClassName = ({ row, column }) => {
+  if (column.property !== 'status') return ''
+  return `mobile-status-cell status-${Number(row.status ?? 0)}`
+}
+
+const getRowKey = (row) => row.id || row.account || row.accountName
+
+const animatePageEntrance = () => {
+  if (!pageRoot.value) return
+  pageAnimationContext?.revert()
+  pageAnimationContext = gsap.context(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) return
+    gsap.from('.desktop-entrance, .mobile-entrance', {
+      autoAlpha: 0,
+      y: 18,
+      duration: 0.58,
+      ease: 'power2.out',
+      stagger: 0.08
+    })
+  }, pageRoot.value)
+}
+
+const animateTableRows = () => {
+  if (!pageRoot.value) return
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduceMotion) return
+  gsap.from(pageRoot.value.querySelectorAll('.el-table__body-wrapper tbody tr'), {
+    autoAlpha: 0,
+    y: 8,
+    duration: 0.28,
+    ease: 'power1.out',
+    stagger: 0.015,
+    overwrite: 'auto'
   })
 }
 
-// 获取表格行的唯一键值
-const getRowKey = (row) => {
-  return row.id || `${row.account}_${row.accountName || ''}_${row.buyTime || ''}`;
-}
+watch(isMobile, () => {
+  pageSize.value = isMobile.value ? 20 : 16
+  page.value = 1
+  nextTick(animatePageEntrance)
+  loadData()
+})
 
-// 根据状态设置行颜色
-const tableRowClassName = ({ row }) => {
-  // 确保状态值是数字类型，处理可能的null/undefined情况
-  let status = row.status;
-  if (status === null || status === undefined) {
-    status = 0;
-  }
-  status = Number(status);
-  
-  if (status === 0) {
-    return 'status-brushing' // 刷票中 - 浅灰色
-  } else if (status === 1) {
-    return 'status-selling' // 出售中 - 淡蓝色
-  } else if (status === 2) {
-    return 'status-pending' // 出售未收货 - 橙色
-  } else if (status === 3) {
-    return 'status-completed' // 出售完成 - 淡绿色
-  }
-  return ''
-}
+onMounted(async () => {
+  pageSize.value = isMobile.value ? 20 : 16
+  await Promise.all([loadData(), loadAccountingSummary()])
+  await nextTick()
+  animatePageEntrance()
+})
 
-onMounted(loadData)
+onUnmounted(() => {
+  pageAnimationContext?.revert()
+})
 </script>
 
 <style scoped>
-.mobile-pagination {
-  position: sticky;
-  bottom: 0;
+.trade-console {
+  min-height: 100%;
+}
+
+.desktop-console {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: calc(100vh - 32px);
+}
+
+.desk-header,
+.accounting-strip,
+.table-panel {
+  border: 1px solid #e3e8f0;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.desk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-radius: 8px;
+}
+
+.desk-header p,
+.desk-header h1 {
+  margin: 0;
+}
+
+.desk-header p {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.desk-header h1 {
+  margin-top: 4px;
+  color: #111827;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.desk-actions,
+.table-toolbar,
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.console-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 7px;
+  border: 1px solid #d8e1ec;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.console-button:hover {
+  transform: translateY(-1px);
+}
+
+.console-button.primary {
+  color: #fff;
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.console-button.ghost {
+  color: #334155;
   background: #fff;
-  padding: 8px 12px;
-  border-top: 1px solid #ebeef5;
-  z-index: 10;
-}
-.list-controls {
-  margin-bottom: 8px;
 }
 
-/* 根据状态设置表格行颜色 */
-:deep(.el-table__body tr.status-brushing > td) {
-  background-color: #f5f5f5 !important; /* 刷票中 - 浅灰色 */
+.accounting-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e3e8f0;
 }
 
-:deep(.el-table__body tr.status-selling > td) {
-  background-color: #e3f2fd !important; /* 出售中 - 淡蓝色 */
+.accounting-card {
+  min-height: 70px;
+  padding: 14px 18px;
+  background: #fff;
 }
 
-:deep(.el-table__body tr.status-pending > td) {
-  background-color: #fff3e0 !important; /* 出售未收货 - 橙色 */
+.accounting-card span,
+.accounting-card small {
+  display: block;
+  color: #64748b;
 }
 
-:deep(.el-table__body tr.status-completed > td) {
-  background-color: #e8f5e8 !important; /* 出售完成 - 淡绿色 */
+.accounting-card span {
+  font-size: 13px;
+  font-weight: 700;
 }
-.search-controls {
-  margin-bottom: 16px;
+
+.accounting-card strong {
+  display: block;
+  margin: 8px 0 0;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.accounting-card small {
+  font-size: 12px;
+}
+
+.accounting-card.huoxing {
+  border-top: 3px solid #2563eb;
+}
+
+.accounting-card.kaka {
+  border-top: 3px solid #0f766e;
+}
+
+.table-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.table-toolbar {
+  justify-content: flex-start;
+  padding-bottom: 12px;
+}
+
+.keyword-input {
+  width: 320px;
+}
+
+.status-select {
+  width: 132px;
+}
+
+.account-table {
+  --el-table-border-color: #eef2f7;
+  --el-table-header-bg-color: #f8fafc;
+  --el-table-row-hover-bg-color: #f6faff;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+:deep(.account-table .el-table__header th) {
+  height: 42px;
+  color: #475569;
+  font-weight: 800;
+  background: #f8fafc !important;
+}
+
+:deep(.account-table .el-table__cell) {
+  border-right: 0 !important;
+}
+
+:deep(.account-table .el-table__body tr.status-0 > td) {
+  background: #dbeafe !important;
+}
+
+:deep(.account-table .el-table__body tr.status-1 > td) {
+  background: #fef3c7 !important;
+}
+
+:deep(.account-table .el-table__body tr.status-3 > td) {
+  background: #dcfce7 !important;
+}
+
+:deep(.account-table .el-table__body tr.status-2 > td) {
+  background: #fee2e2 !important;
+}
+
+:deep(.account-table .el-table__fixed-right::before),
+:deep(.account-table .el-table__fixed::before) {
+  box-shadow: none;
+}
+
+:deep(.account-table .el-table__fixed-right) {
+  box-shadow: -8px 0 18px rgba(15, 23, 42, 0.06);
+}
+
+.ticket-stack {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.editable-value,
+.price-edit,
+.text-edit {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.editable-value {
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.editable-value.green {
+  color: #047857;
+  background: #dff7ea;
+}
+
+.editable-value.yellow {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.price-edit,
+.text-edit {
+  padding: 0;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.status-inline-select {
+  width: 92px;
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.form-grid .full-row {
+  grid-column: 1 / -1;
+}
+
+.mobile-delivery {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  height: calc(100dvh - 48px);
+  min-height: 0;
+  padding: 8px;
+  overflow: hidden;
+  background: #f3f6fb;
+}
+
+.mobile-delivery-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-search {
+  flex: 1;
+}
+
+.mobile-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  border: 1px solid #d8e1ec;
+  border-radius: 8px;
+  color: #1f2937;
+  background: #fff;
+}
+
+.mobile-account-table {
+  min-height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+:deep(.mobile-account-table .el-table__header th) {
+  height: 38px;
+  color: #475569;
+  font-weight: 800;
+  background: #f8fafc !important;
+}
+
+:deep(.mobile-account-table .el-table__cell) {
+  border-right: 0 !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-0 > td) {
+  background: #dbeafe !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-1 > td) {
+  background: #fef3c7 !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-2 > td) {
+  background: #fee2e2 !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-3 > td) {
+  background: #dcfce7 !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-0 > td.mobile-status-cell) {
+  background: #93c5fd !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-1 > td.mobile-status-cell) {
+  background: #fcd34d !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-2 > td.mobile-status-cell) {
+  background: #fca5a5 !important;
+}
+
+:deep(.mobile-account-table .el-table__body tr.status-3 > td.mobile-status-cell) {
+  background: #86efac !important;
+}
+
+:deep(.mobile-status-cell .el-select__wrapper) {
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.mobile-account-cell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mobile-account-cell strong,
+.mobile-account-cell span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-account-cell strong {
+  color: #111827;
+}
+
+.mobile-account-cell span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.mobile-ticket-stack {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.mobile-ticket-value {
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.mobile-ticket-value.green {
+  color: #047857;
+  background: #dff7ea;
+}
+
+.mobile-ticket-value.yellow {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.mobile-copy-button,
+.mobile-price-button {
+  border: 0;
+  border-radius: 7px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobile-copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 30px;
+  padding: 0 12px;
+  color: #1d4ed8;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.18);
+}
+
+.mobile-price-button {
+  padding: 4px 0;
+  color: #0f766e;
+  background: transparent;
+}
+
+.mobile-status-select {
+  width: 82px;
+}
+
+.mobile-pagination {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  min-height: 34px;
+  padding: 2px 0 0;
+}
+
+@media (max-width: 767px) {
+  .trade-console {
+    height: calc(100dvh - 48px);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .mobile-delivery {
+    height: 100%;
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .mobile-account-table {
+    font-size: 12px;
+  }
+
+  .mobile-copy-button {
+    min-width: 44px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+
+  .mobile-price-button {
+    font-size: 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

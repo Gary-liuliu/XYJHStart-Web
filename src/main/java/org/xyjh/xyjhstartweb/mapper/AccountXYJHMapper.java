@@ -36,6 +36,15 @@ public interface AccountXYJHMapper {
     @Select("SELECT * FROM account_xyjh WHERE id = #{id}")
     AccountXYJH selectAccountById(Long id);
 
+    @Select("SELECT * FROM account_xyjh WHERE account = #{account} LIMIT 1")
+    AccountXYJH selectAccountByAccount(String account);
+
+    @Select("SELECT * FROM account_xyjh WHERE account_name = #{accountName} LIMIT 1")
+    AccountXYJH selectAccountByAccountName(String accountName);
+
+    @Select("SELECT * FROM account_xyjh WHERE sell_price IS NOT NULL AND buy_price IS NOT NULL AND sell_price > 0 ORDER BY sell_time DESC")
+    List<AccountXYJH> selectAccountedAccounts();
+
     /**
      * 分页查询账号列表
      */

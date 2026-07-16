@@ -22,7 +22,6 @@ public class AccountXYJH {
     private String remark;
     private String strongCharacter;
 
-    // 构造函数
     public AccountXYJH() {}
 
     public AccountXYJH(String account, String password, String accountName, LocalDateTime buyTime, 
@@ -34,11 +33,10 @@ public class AccountXYJH {
         this.buyPrice = buyPrice;
         this.greenTicket = greenTicket;
         this.yellowTicket = yellowTicket;
-        this.status = 0; // 默认状态为刷票中
+        this.status = 0;
         this.updateTime = LocalDateTime.now();
     }
 
-    // Getter & Setter 方法
     public Long getId() {
         return id;
     }
