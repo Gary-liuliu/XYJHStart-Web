@@ -15,6 +15,8 @@ import java.util.Map;
 @Component
 public class DuduPlanSessionRegistry implements DuduPlanRealtimeGateway {
     private static final CloseStatus REPLACED = new CloseStatus(4001, "replaced_by_new_connection");
+    private static final int SEND_TIME_LIMIT_MILLIS = 15_000;
+    private static final int SEND_BUFFER_SIZE_BYTES = 512 * 1_024;
 
     private final ObjectMapper objectMapper;
     private final EnumMap<DuduPlanRole, RegisteredSession> sessions = new EnumMap<>(DuduPlanRole.class);
@@ -25,7 +27,8 @@ public class DuduPlanSessionRegistry implements DuduPlanRealtimeGateway {
 
     public void register(DuduPlanRole role, WebSocketSession rawSession) {
         RegisteredSession replacement = new RegisteredSession(rawSession,
-                new ConcurrentWebSocketSessionDecorator(rawSession, 5_000, 65_536));
+                new ConcurrentWebSocketSessionDecorator(
+                        rawSession, SEND_TIME_LIMIT_MILLIS, SEND_BUFFER_SIZE_BYTES));
         RegisteredSession previous;
         synchronized (sessions) {
             previous = sessions.put(role, replacement);
@@ -61,7 +64,7 @@ public class DuduPlanSessionRegistry implements DuduPlanRealtimeGateway {
         }
         try {
             registered.concurrentSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(event)));
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             closeQuietly(registered.rawSession(), CloseStatus.SERVER_ERROR);
         }
     }
@@ -83,7 +86,7 @@ public class DuduPlanSessionRegistry implements DuduPlanRealtimeGateway {
             } else if (session.isOpen()) {
                 session.sendMessage(new TextMessage(payload));
             }
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             closeQuietly(session, CloseStatus.SERVER_ERROR);
         }
     }
@@ -98,6 +101,10 @@ public class DuduPlanSessionRegistry implements DuduPlanRealtimeGateway {
 
     private boolean bothOnline() {
         return isOnline(DuduPlanRole.OWNER) && isOnline(DuduPlanRole.OBSERVER);
+    }
+
+    public void refreshPresence() {
+        publishPresence(false);
     }
 
     private void publishPresence(boolean requestSnapshot) {

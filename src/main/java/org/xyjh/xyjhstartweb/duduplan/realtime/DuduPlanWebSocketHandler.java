@@ -144,9 +144,12 @@ public class DuduPlanWebSocketHandler extends AbstractWebSocketHandler {
 
     private void handleAuthenticatedMessage(ConnectionState state, String type, JsonNode payload) {
         switch (type) {
-            case "heartbeat" -> sessionRegistry.sendToSession(state.session, Map.of(
-                    "protocolVersion", 2, "type", "heartbeat", "sentAt", System.currentTimeMillis()
-            ));
+            case "heartbeat" -> {
+                sessionRegistry.sendToSession(state.session, Map.of(
+                        "protocolVersion", 2, "type", "heartbeat", "sentAt", System.currentTimeMillis()
+                ));
+                sessionRegistry.refreshPresence();
+            }
             case "chat_message" -> handleChatMessage(state, payload);
             case "snapshot", "session_upsert", "workout_event" -> forwardOwnerTrainingEvent(state, type, payload);
             case "event_ack" -> forwardObserverAcknowledgement(state, payload);
