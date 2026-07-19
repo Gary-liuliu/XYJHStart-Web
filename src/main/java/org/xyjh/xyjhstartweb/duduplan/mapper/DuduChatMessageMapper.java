@@ -71,7 +71,7 @@ public interface DuduChatMessageMapper {
     @Update("""
             UPDATE dudu_chat_message
             SET delivered_at = COALESCE(delivered_at, #{readAt}), read_at = COALESCE(read_at, #{readAt})
-            WHERE receiver_role = #{receiverRole} AND id &lt;= #{upToId} AND recalled_at IS NULL
+            WHERE receiver_role = #{receiverRole} AND id <= #{upToId} AND recalled_at IS NULL
             """)
     int markRead(@Param("receiverRole") String receiverRole, @Param("upToId") long upToId,
                  @Param("readAt") long readAt);
@@ -79,7 +79,7 @@ public interface DuduChatMessageMapper {
     @Update("""
             UPDATE dudu_chat_message SET recalled_at = #{recalledAt}
             WHERE message_id = #{messageId} AND sender_role = #{senderRole}
-              AND recalled_at IS NULL AND server_created_at &gt;= #{earliestServerCreatedAt}
+              AND recalled_at IS NULL AND server_created_at >= #{earliestServerCreatedAt}
             """)
     int recall(@Param("messageId") String messageId, @Param("senderRole") String senderRole,
                @Param("recalledAt") long recalledAt, @Param("earliestServerCreatedAt") long earliestServerCreatedAt);
